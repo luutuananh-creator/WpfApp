@@ -1,0 +1,31 @@
+﻿<Window x:Class="WpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <!-- Chia 2 cột: Cột trái (Menu) rộng 200, Cột phải (Nội dung) chiếm phần còn lại -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- MENU BÊN TRÁI -->
+        <StackPanel Grid.Column="0" Background="LightGray">
+            <Button x:Name="btnMenuTongQuan" Content="Tổng quan" Height="40" Click="btnMenuTongQuan_Click"/>
+            <Button x:Name="btnMenuGiaoDich" Content="Giao dịch" Height="40" Click="btnMenuGiaoDich_Click"/>
+            <Button x:Name="btnMenuDanhMuc" Content="Danh mục" Height="40" Click="btnMenuDanhMuc_Click"/>
+            <Button x:Name="btnMenuNganSach" Content="Ngân sách" Height="40" Click="btnMenuNganSach_Click"/>
+            <Button x:Name="btnMenuMucTieu" Content="Mục tiêu tiết kiệm" Height="40" Click="btnMenuMucTieu_Click"/>
+            <Button x:Name="btnMenuPhanTich" Content="Phân tích" Height="40" Click="btnMenuPhanTich_Click"/>
+            <Button x:Name="btnMenuTroLyAI" Content="Trợ lý AI" Height="40" Click="btnMenuTroLyAI_Click"/>
+            <Button x:Name="btnMenuCaiDat" Content="Cài đặt" Height="40" Click="btnMenuCaiDat_Click"/>
+        </StackPanel>
+
+        <!-- VÙNG HIỂN THỊ PAGE BÊN PHẢI -->
+        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" />
+    </Grid>
+</Window>
