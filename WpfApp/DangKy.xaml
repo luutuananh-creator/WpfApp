@@ -5,24 +5,54 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="DangKy" Height="450" Width="800">
-    <Grid>
-        <!-- Khung chứa căn giữa màn hình -->
-        <StackPanel Width="300" VerticalAlignment="Center" HorizontalAlignment="Center">
+        Title="Đăng Ký Tài Khoản" Height="500" Width="400"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
-            <!-- Nút Tạo tài khoản gắn với sự kiện btnTaoTaiKhoan_Click -->
-            <Button x:Name="btnTaoTaiKhoan" 
-                Content="Tạo Tài Khoản" 
-                Height="40" 
-                Margin="0,0,0,10" 
-                Click="btnTaoTaiKhoan_Click"/>
+    <Grid Background="#F5F6FA">
+        <!-- Khung form đăng ký căn giữa -->
+        <Border Width="340" Background="White" CornerRadius="10" Padding="30" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect Color="#CCCCCC" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
+            </Border.Effect>
 
-            <!-- Nút Quay lại gắn với sự kiện btnQuayLai_Click -->
-            <Button x:Name="btnQuayLai" 
-                Content="Quay lại" 
-                Height="40" 
-                Click="btnQuayLai_Click"/>
+            <StackPanel>
+                <!-- Tiêu đề -->
+                <TextBlock Text="ĐĂNG KÝ" FontSize="24" FontWeight="Bold" Foreground="#2F3640" 
+                           HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
-        </StackPanel>
+                <!-- Tên đăng nhập -->
+                <TextBlock Text="Tên đăng nhập" FontWeight="SemiBold" Foreground="#57606F" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtTaiKhoan" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,15"/>
+
+                <!-- Mật khẩu -->
+                <TextBlock Text="Mật khẩu" FontWeight="SemiBold" Foreground="#57606F" Margin="0,0,0,5"/>
+                <PasswordBox x:Name="txtMatKhau" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,15"/>
+
+                <!-- Nhập lại mật khẩu -->
+                <TextBlock Text="Xác nhận mật khẩu" FontWeight="SemiBold" Foreground="#57606F" Margin="0,0,0,5"/>
+                <PasswordBox x:Name="txtXacNhanMatKhau" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,20"/>
+
+                <!-- Nút Tạo Tài Khoản -->
+                <Button x:Name="btnTaoTaiKhoan" 
+                        Content="Tạo Tài Khoản" 
+                        Height="40" 
+                        Background="#007ACC" 
+                        Foreground="White" 
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        Margin="0,0,0,10" 
+                        Click="btnTaoTaiKhoan_Click"/>
+
+                <!-- Nút Quay lại -->
+                <Button x:Name="btnQuayLai" 
+                        Content="Quay lại đăng nhập" 
+                        Height="35" 
+                        Background="Transparent" 
+                        Foreground="#57606F" 
+                        BorderBrush="Transparent"
+                        Cursor="Hand"
+                        Click="btnQuayLai_Click"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

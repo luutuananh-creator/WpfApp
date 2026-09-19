@@ -26,20 +26,34 @@ namespace WpfApp
 
         private void btnTaoTaiKhoan_Click(object sender, RoutedEventArgs e)
         {
-            // Viết code lưu tài khoản vào cơ sở dữ liệu ở đây (nếu có)
-            MessageBox.Show("Đăng ký thành công!");
+            string taiKhoan = txtTaiKhoan.Text.Trim();
+            string matKhau = txtMatKhau.Password;
+            string xacNhanMatKhau = txtXacNhanMatKhau.Password;
 
-            // Quay lại màn hình đăng nhập
-            DangNhap dangNhapWin = new DangNhap();
-            dangNhapWin.Show();
-            this.Close();
+            // Kiểm tra dữ liệu cơ bản
+            if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(matKhau) || string.IsNullOrEmpty(xacNhanMatKhau))
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (matKhau != xacNhanMatKhau)
+            {
+                MessageBox.Show("Mật khẩu xác nhận không khớp!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Tiến hành lưu vào cơ sở dữ liệu ở đây...
+            MessageBox.Show("Tạo tài khoản thành công!", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void btnQuayLai_Click(object sender, RoutedEventArgs e)
         {
-            DangNhap dangNhapWin = new DangNhap();
-            dangNhapWin.Show();
+            // Đoạn code quay lại cửa sổ trước (ví dụ: màn hình đăng nhập)
+             DangNhap manHinhDangNhap = new DangNhap();
+             manHinhDangNhap.Show();
             this.Close();
         }
     }
-}
+    }
+
