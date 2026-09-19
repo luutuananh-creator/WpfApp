@@ -1,23 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WpfApp
 {
-    /// <summary>
-    /// Interaction logic for CaiDat.xaml
-    /// </summary>
     public partial class CaiDat : Page
     {
         public CaiDat()
@@ -45,12 +30,18 @@ namespace WpfApp
 
         private void btnDangXuat_Click(object sender, RoutedEventArgs e)
         {
-            // Mở lại cửa sổ Đăng nhập
+            var result = MessageBox.Show(
+                "Bạn có chắc chắn muốn đăng xuất?",
+                "Xác nhận đăng xuất",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes) return;
+
             DangNhap dangNhapWin = new DangNhap();
             dangNhapWin.Show();
 
-            // Đóng MainWindow hiện tại (cửa sổ đang chứa Frame và Page Cài đặt này)
-            Window.GetWindow(this).Close();
+            Window.GetWindow(this)?.Close();
         }
     }
 }

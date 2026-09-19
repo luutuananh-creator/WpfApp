@@ -24,5 +24,25 @@ namespace WpfApp
         {
             InitializeComponent();
         }
+
+        private void btnThemNganSach_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnXemGiaoDich_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnSuaNganSach_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnXoaNganSach_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

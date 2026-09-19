@@ -131,6 +131,21 @@ namespace WpfApp
 
             dataGridDanhMuc.ItemsSource = ketQua;
         }
+
+        private void btnThemDanhMuc_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnSuaDanhMuc_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnXoaDanhMuc_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
 

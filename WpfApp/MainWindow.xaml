@@ -7,25 +7,92 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <!-- Chia 2 cột: Cột trái (Menu) rộng 200, Cột phải (Nội dung) chiếm phần còn lại -->
+        <!-- ĐỊNH NGHĨA GIAO DIỆN CHUNG CHO CÁC NÚT (STYLE) -->
+        <Grid.Resources>
+            <Style x:Key="MenuButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="#E2E8F0"/>
+                <!-- Màu chữ xám nhạt -->
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Padding" Value="20,12,0,12"/>
+                <!-- Khoảng cách viền -->
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="BorderThickness" Value="4,0,0,0"/>
+                <!-- Độ dày viền trái (ẩn mặc định) -->
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <!-- Con trỏ chuột hình bàn tay -->
+
+                <!-- Ghi đè thiết kế mặc định của WPF để tạo nút phẳng -->
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                              VerticalAlignment="Center" 
+                                              Margin="{TemplateBinding Padding}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <!-- Hiệu ứng khi di chuột (Hover) -->
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#334155"/>
+                        <!-- Nền sáng lên một chút -->
+                        <Setter Property="BorderBrush" Value="#3B82F6"/>
+                        <!-- Hiện dải màu xanh bên trái -->
+                        <Setter Property="Foreground" Value="White"/>
+                        <!-- Chữ trắng sáng -->
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
+
+        <!-- CHIA CỘT -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="230"/>
+            <!-- Mở rộng thanh Menu một chút cho thoáng -->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- MENU BÊN TRÁI -->
-        <StackPanel Grid.Column="0" Background="LightGray">
-            <Button x:Name="btnMenuTongQuan" Content="Tổng quan" Height="40" Click="btnMenuTongQuan_Click"/>
-            <Button x:Name="btnMenuGiaoDich" Content="Giao dịch" Height="40" Click="btnMenuGiaoDich_Click"/>
-            <Button x:Name="btnMenuDanhMuc" Content="Danh mục" Height="40" Click="btnMenuDanhMuc_Click"/>
-            <Button x:Name="btnMenuNganSach" Content="Ngân sách" Height="40" Click="btnMenuNganSach_Click"/>
-            <Button x:Name="btnMenuMucTieu" Content="Mục tiêu tiết kiệm" Height="40" Click="btnMenuMucTieu_Click"/>
-            <Button x:Name="btnMenuPhanTich" Content="Phân tích" Height="40" Click="btnMenuPhanTich_Click"/>
-            <Button x:Name="btnMenuTroLyAI" Content="Trợ lý AI" Height="40" Click="btnMenuTroLyAI_Click"/>
-            <Button x:Name="btnMenuCaiDat" Content="Cài đặt" Height="40" Click="btnMenuCaiDat_Click"/>
-        </StackPanel>
+        <!-- MENU BÊN TRÁI (SIDEBAR) -->
+        <Border Grid.Column="0" Background="#1E293B">
+            <!-- Nền xanh đen hiện đại -->
+            <StackPanel>
+
+                <!-- Logo / Tiêu đề ứng dụng -->
+                <StackPanel Orientation="Horizontal" Margin="20,30,20,20" HorizontalAlignment="Center">
+                    <TextBlock Text="💰" FontSize="24" Margin="0,0,10,0"/>
+                    <TextBlock Text="My Finance" Foreground="White" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Đường kẻ phân cách ngang -->
+                <Rectangle Height="1" Fill="#334155" Margin="20,0,20,20"/>
+
+                <!-- Danh sách Nút (Áp dụng Style đã viết ở trên) -->
+                <Button x:Name="btnMenuTongQuan" Content="📊  Tổng quan" Style="{StaticResource MenuButtonStyle}" Click="btnMenuTongQuan_Click"/>
+                <Button x:Name="btnMenuGiaoDich" Content="💸  Giao dịch" Style="{StaticResource MenuButtonStyle}" Click="btnMenuGiaoDich_Click"/>
+                <Button x:Name="btnMenuDanhMuc" Content="📂  Danh mục" Style="{StaticResource MenuButtonStyle}" Click="btnMenuDanhMuc_Click"/>
+                <Button x:Name="btnMenuNganSach" Content="🎯  Ngân sách" Style="{StaticResource MenuButtonStyle}" Click="btnMenuNganSach_Click"/>
+                <Button x:Name="btnMenuMucTieu" Content="⭐  Mục tiêu tiết kiệm" Style="{StaticResource MenuButtonStyle}" Click="btnMenuMucTieu_Click"/>
+                <Button x:Name="btnMenuPhanTich" Content="📈  Phân tích" Style="{StaticResource MenuButtonStyle}" Click="btnMenuPhanTich_Click"/>
+
+                <!-- Đường kẻ phân cách trước các tính năng hệ thống -->
+                <Rectangle Height="1" Fill="#334155" Margin="20,20,20,10"/>
+
+                <Button x:Name="btnMenuTroLyAI" Content="🤖  Trợ lý AI" Style="{StaticResource MenuButtonStyle}" Click="btnMenuTroLyAI_Click"/>
+                <Button x:Name="btnMenuCaiDat" Content="⚙️  Cài đặt" Style="{StaticResource MenuButtonStyle}" Click="btnMenuCaiDat_Click"/>
+
+            </StackPanel>
+        </Border>
 
         <!-- VÙNG HIỂN THỊ PAGE BÊN PHẢI -->
-        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" />
+        <!-- Đặt nền xám rất nhạt (#F8FAFC) để làm nổi bật các Card màu trắng trong Page -->
+        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" Background="#F8FAFC" />
     </Grid>
 </Window>

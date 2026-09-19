@@ -42,5 +42,15 @@ namespace WpfApp
             NhapGiaoDichAI win = new NhapGiaoDichAI();
             win.ShowDialog();
         }
+
+        private void btnXoaGiaoDich_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnSuaGiaoDich_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
