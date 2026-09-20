@@ -5,8 +5,92 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="NhapGiaoDichAI" Height="450" Width="800">
-    <Grid>
-        
+        Title="Nhập Giao Dịch Bằng AI" Height="650" Width="600"
+        WindowStartupLocation="CenterScreen" Background="#F8FAFC">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 0: Tiêu đề -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 1: Khu vực nhập liệu & Nút Phân tích -->
+            <RowDefinition Height="*"/>
+            <!-- Dòng 2: Khu vực hiển thị kết quả (DataGrid) -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 3: Nút Hủy và Lưu -->
+        </Grid.RowDefinitions>
+
+        <!-- TIÊU ĐỀ -->
+        <TextBlock Grid.Row="0" Text="✨ NHẬP GIAO DỊCH BẰNG AI" FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+        <!-- KHU VỰC NHẬP TEXT VÀ GỬI AI -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <TextBlock Text="Nhập nội dung (VD: Hôm qua đổ xăng 50k, sáng nay ăn phở 35k):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+
+            <TextBox x:Name="txtNoiDung" Height="80" Padding="10" TextWrapping="Wrap" AcceptsReturn="True" 
+                     VerticalScrollBarVisibility="Auto" FontSize="15" BorderBrush="#CBD5E1" 
+                     Text="Sáng nay uống cafe 25k, trưa ăn cơm tấm 40k..." TextChanged="txtNoiDung_TextChanged"/>
+
+            <!-- Nút Phân tích AI -->
+            <Button x:Name="btnPhanTich" Content="🪄 Phân tích dữ liệu" Height="45" Margin="0,15,0,0"
+                    Background="#8B5CF6" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand"
+                    Click="btnPhanTich_Click"/>
+
+            <!-- Dòng thông báo trạng thái ẩn (Sẽ hiện khi AI đang xử lý) -->
+            <TextBlock x:Name="txtTrangThai" Text="Đang xử lý dữ liệu..." Foreground="#64748B" FontStyle="Italic" 
+                       HorizontalAlignment="Center" Margin="0,10,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- KHU VỰC KẾT QUẢ AI BÓC TÁCH (DATAGRID) -->
+        <Grid Grid.Row="2" Margin="0,10,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Kết quả AI nhận diện:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+
+            <DataGrid x:Name="dgvKetQuaAI" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" 
+                      HeadersVisibility="Column" Background="White" RowHeight="35" ColumnHeaderHeight="40"
+                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E2E8F0" BorderBrush="#CBD5E1" SelectionChanged="dgvKetQuaAI_SelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMuc}" Width="120"/>
+
+                    <DataGridTextColumn Header="Số tiền" Binding="{Binding SoTien}" Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="Margin" Value="0,0,10,0"/>
+                                <Setter Property="Foreground" Value="#EF4444"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Ghi chú" Binding="{Binding GhiChu}" Width="*"/>
+
+                    <DataGridTextColumn Header="Ngày" Binding="{Binding Ngay}" Width="90"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- KHU VỰC NÚT HÀNH ĐỘNG -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Nút Hủy -->
+            <Button x:Name="btnHuy" Grid.Column="0" Content="Hủy bỏ" Height="45" 
+                    Background="#94A3B8" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+                    Click="btnHuy_Click"/>
+
+            <!-- Nút Xác nhận & Lưu -->
+            <Button x:Name="btnXacNhanLuu" Grid.Column="2" Content="💾 Xác nhận &amp; Lưu" Height="45" 
+                    Background="#10B981" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+                    Click="btnXacNhanLuu_Click"/>
+        </Grid>
     </Grid>
 </Window>

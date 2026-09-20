@@ -24,5 +24,41 @@ namespace WpfApp
         {
             InitializeComponent();
         }
+
+        private void btnThemMucTieu_Click(object sender, RoutedEventArgs e)
+        {
+            ThemSuaMucTieu win = new ThemSuaMucTieu();
+            win.ShowDialog();
+        }
+
+        private void btnCapNhatTienDo_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnSuaMucTieu_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnXoaMucTieu_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void cboTrangThai_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void txtTimKiemMucTieu_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void dgvMucTieu_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

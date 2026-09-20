@@ -5,8 +5,64 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="ThemSuaMucTieu" Height="450" Width="800">
-    <Grid>
-        
+        Title="Thêm / Sửa Mục Tiêu" Height="550" Width="450"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#F8FAFC">
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Header -->
+            <RowDefinition Height="*"/>
+            <!-- Vùng nhập liệu -->
+            <RowDefinition Height="Auto"/>
+            <!-- Nút hành động -->
+        </Grid.RowDefinitions>
+
+        <!-- TIÊU ĐỀ -->
+        <TextBlock Grid.Row="0" Text="THÔNG TIN MỤC TIÊU" FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,25"/>
+
+        <!-- KHU VỰC FORM NHẬP LIỆU -->
+        <StackPanel Grid.Row="1">
+
+            <!-- Tên mục tiêu -->
+            <TextBlock Text="Tên mục tiêu (VD: Mua Laptop, Du lịch...):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtTenMucTieu" Height="45" Padding="10,0" FontSize="16" 
+                     VerticalContentAlignment="Center" Margin="0,0,0,15" BorderBrush="#CBD5E1" TextChanged="txtTenMucTieu_TextChanged"/>
+
+            <!-- Số tiền mục tiêu -->
+            <TextBlock Text="Số tiền mục tiêu (VND):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtSoTienMucTieu" Height="45" Padding="10,0" FontSize="18" FontWeight="Bold" 
+                     VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Margin="0,0,0,15"
+                     BorderBrush="#CBD5E1" Text="0" TextChanged="txtSoTienMucTieu_TextChanged"/>
+
+            <!-- Số tiền đã tích lũy -->
+            <TextBlock Text="Số tiền đã có sẵn (VND):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtDaTichLuy" Height="45" Padding="10,0" FontSize="18" FontWeight="Bold" Foreground="#10B981"
+                     VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Margin="0,0,0,15"
+                     BorderBrush="#CBD5E1" Text="0" TextChanged="txtDaTichLuy_TextChanged"/>
+
+            <!-- Ngày dự kiến hoàn thành -->
+            <TextBlock Text="Ngày dự kiến hoàn thành:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+            <DatePicker x:Name="dpNgayHoanThanh" Height="40" FontSize="14" BorderBrush="#CBD5E1"/>
+
+        </StackPanel>
+
+        <!-- KHU VỰC NÚT HÀNH ĐỘNG -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <!-- Khoảng cách 2 nút -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="btnHuy" Grid.Column="0" Content="Hủy bỏ" Height="45" 
+                    Background="#94A3B8" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+                    Click="btnHuy_Click"/>
+
+            <Button x:Name="btnLuu" Grid.Column="2" Content="💾 Lưu mục tiêu" Height="45" 
+                    Background="#3B82F6" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+                    Click="btnLuu_Click"/>
+        </Grid>
     </Grid>
 </Window>

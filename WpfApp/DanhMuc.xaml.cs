@@ -57,11 +57,9 @@ namespace WpfApp
 
         private void btnThem_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "Mở form thêm danh mục",
-                "Thông báo",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            ThemSuaDanhMuc win = new ThemSuaDanhMuc();
+            win.ShowDialog();
+            
         }
 
 

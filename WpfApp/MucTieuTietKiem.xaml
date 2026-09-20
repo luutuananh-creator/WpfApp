@@ -5,10 +5,144 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApp"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="MucTieuTietKiem">
 
-    <Grid>
+    <Grid Margin="20">
+        <!-- CHIA TRANG THÀNH 4 DÒNG -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 0: Tiêu đề -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 1: Tìm kiếm & Lọc -->
+            <RowDefinition Height="*"/>
+            <!-- Dòng 2: Bảng danh sách mục tiêu -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 3: Các nút hành động -->
+        </Grid.RowDefinitions>
+
+        <!-- TIÊU ĐỀ -->
+        <TextBlock Grid.Row="0" Text="MỤC TIÊU TIẾT KIỆM" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+
+        <!-- THANH CÔNG CỤ TÌM KIẾM -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+            <!-- Ô tìm kiếm mục tiêu -->
+            <TextBox x:Name="txtTimKiemMucTieu" Width="250" Height="35" Padding="10,8" Margin="0,0,10,0" 
+                     VerticalContentAlignment="Center" Text="🔍 Nhập tên mục tiêu..." TextChanged="txtTimKiemMucTieu_TextChanged"/>
+
+            <!-- Lọc trạng thái -->
+            <ComboBox x:Name="cboTrangThai" Width="150" Height="35" VerticalContentAlignment="Center" SelectionChanged="cboTrangThai_SelectionChanged">
+                <ComboBoxItem Content="Đang thực hiện" IsSelected="True"/>
+                <ComboBoxItem Content="Đã hoàn thành"/>
+                <ComboBoxItem Content="Tất cả mục tiêu"/>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- BẢNG DỮ LIỆU (DATAGRID) -->
+        <DataGrid x:Name="dgvMucTieu" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" 
+                  HeadersVisibility="Column" Background="White" RowHeight="45" ColumnHeaderHeight="40"
+                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E2E8F0" BorderBrush="#CBD5E1" SelectionChanged="dgvMucTieu_SelectionChanged">
+            <DataGrid.Columns>
+
+                <!-- Cột Tên mục tiêu -->
+                <DataGridTextColumn Header="Tên mục tiêu" Binding="{Binding TenMucTieu}" Width="180">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="10,0,0,0"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Cột Số tiền mục tiêu (Đích đến) -->
+                <DataGridTextColumn Header="Mục tiêu" Binding="{Binding SoTienMucTieu}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="Margin" Value="0,0,10,0"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Cột Đã tích lũy -->
+                <DataGridTextColumn Header="Đã tích lũy" Binding="{Binding DaTichLuy}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="Margin" Value="0,0,10,0"/>
+                            <Setter Property="Foreground" Value="#2E7D32"/>
+                            <!-- Màu xanh lá cho tiền đã gom được -->
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                
+                <DataGridTemplateColumn Header="Tiến độ" Width="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Margin="10,0,10,0" VerticalAlignment="Center">
+                                
+                                <ProgressBar Value="45" Maximum="100" Height="15" Foreground="#3B82F6" Background="#E2E8F0"/>
+                                <TextBlock Text="45%" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="Black"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                
+                <DataGridTextColumn Header="Ngày hoàn thành" Binding="{Binding NgayDuKien}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="Gray"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
         
+        <Grid Grid.Row="3" Margin="0,15,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="116.184"/>
+                <ColumnDefinition Width="28.539"/>
+                
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                
+            </Grid.ColumnDefinitions>
+
+            
+            <Button x:Name="btnThemMucTieu" Grid.Column="0" Content="➕ Thêm Mục tiêu" Height="40" Padding="20,0" 
+                    Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"
+                    Click="btnThemMucTieu_Click" Grid.ColumnSpan="3" Margin="0,0,272,0"/>
+            
+
+            
+            <StackPanel Grid.Column="3" Orientation="Horizontal">
+
+                
+                <Button x:Name="btnCapNhatTienDo" Content="📈 Cập nhật tiến độ" Height="40" Padding="15,0" Margin="0,0,15,0"
+                        Background="#3B82F6" Foreground="White" BorderThickness="0" Cursor="Hand"
+                        Click="btnCapNhatTienDo_Click"/>
+                
+
+                <Button x:Name="btnSuaMucTieu" Content="✏️ Sửa" Height="40" Width="90" Margin="0,0,10,0"
+                        Background="#F59E0B" Foreground="White" BorderThickness="0" Cursor="Hand"
+                        Click="btnSuaMucTieu_Click"/>
+                
+
+                <Button x:Name="btnXoaMucTieu" Content="🗑️ Xóa" Height="40" Width="90"
+                        Background="#EF4444" Foreground="White" BorderThickness="0" Cursor="Hand"
+                        Click="btnXoaMucTieu_Click"/>
+                
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

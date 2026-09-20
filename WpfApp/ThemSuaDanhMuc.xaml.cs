@@ -23,5 +23,30 @@ namespace WpfApp
         {
             InitializeComponent();
         }
+
+        private void txtTenDanhMuc_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void cboIcon_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void cboMauSac_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void btnHuy_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnLuu_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

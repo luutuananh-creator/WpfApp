@@ -23,6 +23,14 @@ namespace WpfApp
         {
             InitializeComponent();
         }
+        private void btnQuanLyDanhMuc_Click(object sender, RoutedEventArgs e)
+        {
+            // Do DanhMuc là một Page, nếu muốn mở nó từ một Window phụ, 
+            // bạn có thể sẽ phải hiện một Window quản lý danh mục dạng Dialog
+            // WindowThemSuaDanhMuc win = new WindowThemSuaDanhMuc();
+            // win.ShowDialog();
+            MessageBox.Show("Mở màn hình Quản lý danh mục.");
+        }
 
         private void btnLuu_Click(object sender, RoutedEventArgs e)
         {
@@ -33,6 +41,31 @@ namespace WpfApp
         private void btnHuy_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void radChiTieu_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radThuNhap_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void txtSoTien_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void cboDanhMuc_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void cboPhuongThuc_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

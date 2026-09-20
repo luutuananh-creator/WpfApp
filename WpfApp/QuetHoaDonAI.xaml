@@ -5,8 +5,94 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="QuetHoaDonAI" Height="450" Width="800">
-    <Grid>
-        
+        Title="Quét Hóa Đơn Bằng AI" Height="700" Width="500"
+        WindowStartupLocation="CenterScreen" Background="#F8FAFC">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 0: Tiêu đề -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 1: Khu vực chọn ảnh -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 2: Nút Phân tích -->
+            <RowDefinition Height="*"/>
+            <!-- Dòng 3: Kết quả bóc tách -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 4: Nút hành động -->
+        </Grid.RowDefinitions>
+
+        <!-- TIÊU ĐỀ -->
+        <TextBlock Grid.Row="0" Text="📷 QUÉT HÓA ĐƠN BẰNG AI" FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+        <!-- KHU VỰC TẢI ẢNH (Drag & Drop) -->
+        <Grid Grid.Row="1" Height="220" Margin="0,0,0,15">
+            <!-- Tạo hiệu ứng viền nét đứt (Dashed Border) -->
+            <Rectangle Stroke="#94A3B8" StrokeThickness="2" StrokeDashArray="4 4" RadiusX="10" RadiusY="10" Fill="#F1F5F9"/>
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!-- Khu vực hiển thị ảnh xem trước (Mặc định ẩn) -->
+                <Image x:Name="imgPreview" Height="140" Margin="0,0,0,10" Visibility="Collapsed"/>
+
+                <!-- Giao diện khi chưa có ảnh -->
+                <StackPanel x:Name="spChonAnhPlaceholder">
+                    <TextBlock Text="Kéo thả hình ảnh hóa đơn vào đây" FontSize="15" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <TextBlock Text="hoặc" FontSize="13" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <Button x:Name="btnChonAnh" Content="📁 Chọn ảnh từ máy tính" Height="40" Width="180"
+                            Background="#E2E8F0" Foreground="#334155" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"
+                            Click="btnChonAnh_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- NÚT PHÂN TÍCH -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,20">
+            <Button x:Name="btnPhanTichHoaDon" Content="🪄 Phân tích hóa đơn" Height="45"
+                    Background="#8B5CF6" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand"
+                    Click="btnPhanTichHoaDon_Click"/>
+
+            <!-- Chữ trạng thái chờ -->
+            <TextBlock x:Name="txtTrangThai" Text="Đang đọc dữ liệu ảnh..." Foreground="#64748B" FontStyle="Italic" 
+                       HorizontalAlignment="Center" Margin="0,10,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- KHU VỰC HIỂN THỊ KẾT QUẢ BÓC TÁCH -->
+        <Border Grid.Row="3" Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="KẾT QUẢ NHẬN DIỆN:" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,15"/>
+
+                <!-- Nơi bán / Cửa hàng -->
+                <TextBlock Text="Cửa hàng / Dịch vụ:" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtCuaHang" Height="35" Padding="10,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Margin="0,0,0,10" IsReadOnly="True" Background="#F8FAFC" TextChanged="txtCuaHang_TextChanged"/>
+
+                <!-- Ngày tháng -->
+                <TextBlock Text="Ngày giao dịch:" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtNgay" Height="35" Padding="10,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Margin="0,0,0,10" IsReadOnly="True" Background="#F8FAFC" TextChanged="txtNgay_TextChanged"/>
+
+                <!-- Tổng tiền -->
+                <TextBlock Text="Tổng tiền thanh toán:" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtTongTien" Height="35" Padding="10,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" 
+                         FontWeight="Bold" FontSize="16" Foreground="#EF4444" BorderBrush="#CBD5E1" Margin="0,0,0,10" IsReadOnly="True" Background="#F8FAFC" TextChanged="txtTongTien_TextChanged"/>
+            </StackPanel>
+        </Border>
+
+        <!-- KHU VỰC NÚT HÀNH ĐỘNG -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Nút Hủy -->
+            <Button x:Name="btnHuy" Grid.Column="0" Content="Hủy bỏ" Height="45" 
+                    Background="#94A3B8" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+                    Click="btnHuy_Click"/>
+
+            <!-- Nút Xác nhận đưa sang trang Thêm giao dịch -->
+            <Button x:Name="btnXacNhanLuu" Grid.Column="2" Content="➡️ Tiếp tục" Height="45" 
+                    Background="#10B981" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+                    Click="btnXacNhanLuu_Click"/>
+        </Grid>
     </Grid>
 </Window>

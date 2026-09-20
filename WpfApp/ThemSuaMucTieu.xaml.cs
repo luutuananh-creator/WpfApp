@@ -23,5 +23,30 @@ namespace WpfApp
         {
             InitializeComponent();
         }
+
+        private void txtTenMucTieu_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void txtSoTienMucTieu_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void txtDaTichLuy_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void btnHuy_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnLuu_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

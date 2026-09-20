@@ -24,5 +24,24 @@ namespace WpfApp
         {
             InitializeComponent();
         }
+        private void btnQuetHoaDon_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            QuetHoaDonAI win = new QuetHoaDonAI();
+            win.ShowDialog();
+        }
+        private void btnNhapGiaoDich_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            NhapGiaoDichAI win = new NhapGiaoDichAI();
+            win.ShowDialog();
+        }
+        private void btnPhanTich_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+
+        }
+        private void btnGuiTinNhan_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+
+        }
     }
+
 }

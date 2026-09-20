@@ -5,10 +5,94 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApp"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="PhanTich">
 
-    <Grid>
-        
+    <Grid Margin="20">
+        <!-- CHIA TRANG THÀNH 4 DÒNG -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 0: Tiêu đề -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 1: Bộ lọc thời gian -->
+            <RowDefinition Height="*"/>
+            <!-- Dòng 2: Khu vực chứa 2 Biểu đồ -->
+            <RowDefinition Height="Auto"/>
+            <!-- Dòng 3: Các nút hành động -->
+        </Grid.RowDefinitions>
+
+        <!-- TIÊU ĐỀ -->
+        <TextBlock Grid.Row="0" Text="PHÂN TÍCH TÀI CHÍNH" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+
+        <!-- BỘ LỌC THỜI GIAN VÀ LOẠI BIỂU ĐỒ -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+            <TextBlock Text="⏳ Thời gian:" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Margin="0,0,10,0"/>
+
+            <ComboBox x:Name="cboLocThoiGian" Width="150" Height="35" VerticalContentAlignment="Center" Margin="0,0,20,0" SelectionChanged="cboLocThoiGian_SelectionChanged">
+                <ComboBoxItem Content="Tuần này"/>
+                <ComboBoxItem Content="Tháng này" IsSelected="True"/>
+                <ComboBoxItem Content="Tháng trước"/>
+                <ComboBoxItem Content="Năm nay"/>
+            </ComboBox>
+
+            <TextBlock Text="📊 Xem theo:" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Margin="0,0,10,0"/>
+
+            <ComboBox x:Name="cboLoaiBieuDo" Width="180" Height="35" VerticalContentAlignment="Center" SelectionChanged="cboLoaiBieuDo_SelectionChanged">
+                <ComboBoxItem Content="Tổng hợp" IsSelected="True"/>
+                <ComboBoxItem Content="Chỉ xem Chi tiêu"/>
+                <ComboBoxItem Content="Chỉ xem Thu nhập"/>
+            </ComboBox>
+
+            <!-- Nút áp dụng bộ lọc -->
+            <Button x:Name="btnApDungLoc" Content="Lọc dữ liệu" Height="35" Padding="15,0" Margin="15,0,0,0"
+                    Background="#E2E8F0" BorderThickness="0" Cursor="Hand" 
+                    Click="btnApDungLoc_Click"/>
+        </StackPanel>
+
+        <!-- KHU VỰC HIỂN THỊ BIỂU ĐỒ -->
+        <Grid Grid.Row="2" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="93*"/>
+                <ColumnDefinition Width="15"/>
+                <!-- Khoảng cách giữa 2 biểu đồ -->
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="88*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- KHUNG 1: Biểu đồ tròn (Cơ cấu chi tiêu theo danh mục) -->
+            <Border Grid.Column="0" Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8" Padding="15">
+                <Grid>
+                    <TextBlock Text="CƠ CẤU CHI TIÊU" FontWeight="Bold" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,15" Height="351" VerticalAlignment="Bottom"/>
+
+                    <!-- Chỗ trống này sau này sẽ nhúng thư viện vẽ Biểu đồ Tròn (PieChart) vào -->
+                    <TextBlock Text="[Khu vực hiển thị Biểu đồ Tròn]" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="LightGray" FontSize="16"/>
+                </Grid>
+            </Border>
+
+            <!-- KHUNG 2: Biểu đồ cột/đường (Thu nhập và Chi tiêu theo thời gian) -->
+            <Border Grid.Column="2" Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8" Padding="15" Margin="11,0,-10,0" Grid.ColumnSpan="2">
+                <Grid>
+                    <TextBlock Text="THU NHẬP VÀ CHI TIÊU" FontWeight="Bold" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
+                    <!-- Chỗ trống này sau này sẽ nhúng thư viện vẽ Biểu đồ Cột (CartesianChart) vào -->
+                    <TextBlock Text="[Khu vực hiển thị Biểu đồ Cột/Đường]" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="LightGray" FontSize="16"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- THANH NÚT HÀNH ĐỘNG DƯỚI CÙNG -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+
+            <!-- Nút chuyển sang trang Giao dịch -->
+            <Button x:Name="btnXemGiaoDich" Content="👁️ Xem Giao dịch chi tiết" Height="40" Padding="20,0" Margin="0,0,15,0"
+                    Background="#3B82F6" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"
+                    Click="btnXemGiaoDich_Click"/>
+
+            <!-- Nút chuyển sang trang Trợ lý AI -->
+            <Button x:Name="btnPhanTichAI" Content="🤖 Phân tích bằng AI" Height="40" Padding="20,0" 
+                    Background="#8B5CF6" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"
+                    Click="btnPhanTichAI_Click"/>
+
+        </StackPanel>
     </Grid>
 </Page>
