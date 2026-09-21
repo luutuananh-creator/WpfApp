@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="Đăng Ký Tài Khoản" Height="500" Width="400"
+        Title="Đăng Ký Tài Khoản" Height="580" Width="800"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Grid Background="#F5F6FA">
         <!-- Khung form đăng ký căn giữa -->
-        <Border Width="340" Background="White" CornerRadius="10" Padding="30" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Border Width="360" Background="White" CornerRadius="10" Padding="30" VerticalAlignment="Center" HorizontalAlignment="Center">
             <Border.Effect>
                 <DropShadowEffect Color="#CCCCCC" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
             </Border.Effect>
@@ -22,19 +22,23 @@
 
                 <!-- Tên đăng nhập -->
                 <TextBlock Text="Tên đăng nhập" FontWeight="SemiBold" Foreground="#57606F" Margin="0,0,0,5"/>
-                <TextBox x:Name="txtTaiKhoan" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,15"/>
+                <TextBox x:Name="txtTaiKhoan" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,12"/>
+
+                <!-- Email -->
+                <TextBlock Text="Email xác thực" FontWeight="SemiBold" Foreground="#57606F" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtEmail" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,12"/>
 
                 <!-- Mật khẩu -->
                 <TextBlock Text="Mật khẩu" FontWeight="SemiBold" Foreground="#57606F" Margin="0,0,0,5"/>
-                <PasswordBox x:Name="txtMatKhau" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,15"/>
+                <PasswordBox x:Name="txtMatKhau" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,12"/>
 
                 <!-- Nhập lại mật khẩu -->
                 <TextBlock Text="Xác nhận mật khẩu" FontWeight="SemiBold" Foreground="#57606F" Margin="0,0,0,5"/>
                 <PasswordBox x:Name="txtXacNhanMatKhau" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,20"/>
 
-                <!-- Nút Tạo Tài Khoản -->
+                <!-- Nút Gửi Mã Xác Thực & Đăng Ký -->
                 <Button x:Name="btnTaoTaiKhoan" 
-                        Content="Tạo Tài Khoản" 
+                        Content="Gửi Mã Xác Thực Email" 
                         Height="40" 
                         Background="#007ACC" 
                         Foreground="White" 
