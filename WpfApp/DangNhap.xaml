@@ -5,38 +5,137 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="DangNhap" Height="450" Width="800">
-    <Grid>
-        <StackPanel Width="300" VerticalAlignment="Center" HorizontalAlignment="Center">
+        Title="Đăng nhập" Height="500" Width="450"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#F5F7FA">
 
-            <TextBlock Text="ĐĂNG NHẬP" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+    <Grid Margin="30">
+        <Border Background="White" CornerRadius="12" Padding="30">
+            <Border.Effect>
+                <DropShadowEffect Color="#000" Opacity="0.08" BlurRadius="15" ShadowDepth="3"/>
+            </Border.Effect>
 
-            <!-- Nhập tài khoản -->
-            <TextBlock Text="Tên đăng nhập / Email:" />
-            <TextBox x:Name="txtTenDangNhap" Margin="0,0,0,10" Padding="5" />
+            <StackPanel>
 
-            <!-- Nhập mật khẩu -->
-            <TextBlock Text="Mật khẩu:" />
-            <PasswordBox x:Name="txtMatKhau" Margin="0,0,0,5" Padding="5" />
+                <!-- ============================================================ -->
+                <!-- KHỐI 1: FORM ĐĂNG NHẬP ĐẦY ĐỦ (hiện mặc định)                 -->
+                <!-- ============================================================ -->
+                <StackPanel x:Name="spDangNhapDayDu">
 
-            <!-- === THÊM NÚT QUÊN MẬT KHẨU TẠI ĐÂY === -->
-            <Button x:Name="btnQuenMatKhau" Content="Quên mật khẩu?" 
-                Background="Transparent" Foreground="#0078D7" BorderThickness="0" 
-                HorizontalAlignment="Right" Margin="0,0,0,10" Cursor="Hand"
-                Click="btnQuenMatKhau_Click"/>
-            <!-- ===================================== -->
+                    <TextBlock Text="ĐĂNG NHẬP"
+                               FontSize="24" FontWeight="Bold"
+                               Foreground="#1F2937"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,25"/>
 
-            <!-- Checkbox ghi nhớ -->
-            <CheckBox x:Name="chkGhiNho" Content="Ghi nhớ đăng nhập" Margin="0,0,0,15"/>
+                    <!-- Tên đăng nhập -->
+                    <TextBlock Text="Tên đăng nhập / Email:"
+                               FontWeight="SemiBold" Foreground="#4B5563"
+                               Margin="0,0,0,5"/>
+                    <TextBox x:Name="txtTenDangNhap"
+                             Height="38" Padding="8,0"
+                             VerticalContentAlignment="Center"
+                             FontSize="14"
+                             Margin="0,0,0,15"/>
 
-            <!-- Nút Đăng nhập -->
-            <Button x:Name="btnDangNhap" Content="Đăng Nhập" Height="35" Margin="0,0,0,10" Background="#0078D7" Foreground="White" 
-                Click="btnDangNhap_Click"/>
+                    <!-- Mật khẩu -->
+                    <TextBlock Text="Mật khẩu:"
+                               FontWeight="SemiBold" Foreground="#4B5563"
+                               Margin="0,0,0,5"/>
+                    <PasswordBox x:Name="txtMatKhau"
+                                 Height="38" Padding="8,0"
+                                 VerticalContentAlignment="Center"
+                                 FontSize="14"
+                                 Margin="0,0,0,5"/>
 
-            <!-- Nút Đăng ký -->
-            <Button x:Name="btnDangKy" Content="Chưa có tài khoản? Đăng ký ngay" Height="35" Background="LightGray"
-                Click="btnDangKy_Click"/>
+                    <!-- Quên mật khẩu -->
+                    <Button x:Name="btnQuenMatKhau"
+                            Content="Quên mật khẩu?"
+                            Background="Transparent"
+                            Foreground="#2563EB"
+                            BorderThickness="0"
+                            FontSize="12"
+                            HorizontalAlignment="Right"
+                            Cursor="Hand"
+                            Margin="0,0,0,15"
+                            Click="btnQuenMatKhau_Click"/>
 
-        </StackPanel>
+                    <!-- Ghi nhớ đăng nhập -->
+                    <CheckBox x:Name="chkGhiNho"
+                              Content="Ghi nhớ đăng nhập"
+                              Foreground="#4B5563"
+                              Margin="0,0,0,20"/>
+
+                    <!-- Nút Đăng nhập -->
+                    <Button x:Name="btnDangNhap"
+                            Content="Đăng Nhập"
+                            Height="42"
+                            Background="#2563EB" Foreground="White"
+                            FontWeight="Bold" FontSize="14"
+                            BorderThickness="0" Cursor="Hand"
+                            Margin="0,0,0,10"
+                            Click="btnDangNhap_Click"/>
+
+                    <!-- Nút Đăng ký -->
+                    <Button x:Name="btnDangKy"
+                            Content="Chưa có tài khoản? Đăng ký ngay"
+                            Height="38"
+                            Background="LightGray" Foreground="#1F2937"
+                            FontWeight="SemiBold" FontSize="13"
+                            BorderThickness="0" Cursor="Hand"
+                            Click="btnDangKy_Click"/>
+                </StackPanel>
+
+                <!-- ============================================================ -->
+                <!-- KHỐI 2: XIN CHÀO (hiện khi đã ghi nhớ lần trước)              -->
+                <!-- ============================================================ -->
+                <StackPanel x:Name="spXinChao" Visibility="Collapsed">
+
+                    <TextBlock Text="ĐĂNG NHẬP"
+                               FontSize="24" FontWeight="Bold"
+                               Foreground="#1F2937"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,25"/>
+
+                    <TextBlock Text="👤"
+                               FontSize="60"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,15"/>
+
+                    <TextBlock x:Name="txtLoiChao"
+                               Text="Xin chào, ..."
+                               FontSize="18" FontWeight="SemiBold"
+                               Foreground="#1F2937"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+
+                    <TextBlock Text="Bạn đã ghi nhớ đăng nhập lần trước"
+                               FontSize="12" Foreground="#6B7280"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,30"/>
+
+                    <!-- Nút Đăng nhập nhanh -->
+                    <Button x:Name="btnDangNhapNhanh"
+                            Content="🚀 Đăng nhập nhanh"
+                            Height="42"
+                            Background="#10B981" Foreground="White"
+                            FontWeight="Bold" FontSize="14"
+                            BorderThickness="0" Cursor="Hand"
+                            Margin="0,0,0,10"
+                            Click="btnDangNhapNhanh_Click"/>
+
+                    <!-- Nút Quay lại (Đổi tài khoản khác) -->
+                    <Button x:Name="btnQuayLai"
+                            Content="← Quay lại (Đổi tài khoản)"
+                            Height="38"
+                            Background="Transparent" Foreground="#6B7280"
+                            FontWeight="SemiBold" FontSize="13"
+                            BorderThickness="0" Cursor="Hand"
+                            Click="btnQuayLai_Click"/>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

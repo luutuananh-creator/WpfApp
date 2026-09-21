@@ -8,8 +8,8 @@ namespace WpfApp.Helpers
     public class EmailService
     {
         // Điền Gmail và App Password (Mật khẩu ứng dụng 16 ký tự) của bạn vào đây
-        private readonly string _fromEmail = "vdong4419@gmail.com";
-        private readonly string _appPassword = "xxxx xxxx xxxx xxxx";
+        private readonly string _fromEmail = "vocongnghia91@gmail.com";
+        private readonly string _appPassword = "gxja nofp fnpg dqmm";
 
         public async Task<bool> SendOtpEmailAsync(string toEmail, string otpCode, string purpose)
         {
