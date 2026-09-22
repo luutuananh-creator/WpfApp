@@ -28,7 +28,7 @@
             <TextBlock Text="Tên danh mục:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
             <TextBox x:Name="txtTenDanhMuc" Height="45" Padding="10,0" FontSize="16" 
                      VerticalContentAlignment="Center" Margin="0,0,0,20" BorderBrush="#CBD5E1"
-                     Text="VD: Ăn uống, Mua sắm..." TextChanged="txtTenDanhMuc_TextChanged"/>
+                     Tag="VD: Ăn uống, Mua sắm..." TextChanged="txtTenDanhMuc_TextChanged"/>
 
             <!-- Chọn Loại danh mục -->
             <TextBlock Text="Phân loại:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>

@@ -35,18 +35,18 @@
             <!-- Cụm Tìm kiếm & Lọc (Trái) -->
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <!-- Ô tìm kiếm -->
-                <TextBox x:Name="txtTimKiem" Width="200" Height="35" Padding="10,8" Margin="0,0,10,0" 
-                         VerticalContentAlignment="Center" Text="🔍 Nhập ghi chú..."/>
+                <TextBox x:Name="txtTimKiem"  Width="200" Height="35" Padding="10,8" Margin="0,0,10,0" 
+                         VerticalContentAlignment="Center" Tag="🔍 " TextChanged="txtTimKiem_TextChanged"/>
 
                 <!-- Lọc Thời gian -->
-                <ComboBox x:Name="cboLocThoiGian" Width="120" Height="35" VerticalContentAlignment="Center" Margin="0,0,10,0">
+                <ComboBox x:Name="cboLocThoiGian" Width="120" Height="35" VerticalContentAlignment="Center" Margin="0,0,10,0" SelectionChanged="cboLocThoiGian_SelectionChanged">
                     <ComboBoxItem Content="Tháng này" IsSelected="True"/>
                     <ComboBoxItem Content="Tháng trước"/>
                     <ComboBoxItem Content="Tất cả thời gian"/>
                 </ComboBox>
 
                 <!-- Lọc Danh mục -->
-                <ComboBox x:Name="cboLocDanhMuc" Width="120" Height="35" VerticalContentAlignment="Center">
+                <ComboBox x:Name="cboLocDanhMuc" Width="120" Height="35" VerticalContentAlignment="Center" SelectionChanged="cboLocDanhMuc_SelectionChanged">
                     <ComboBoxItem Content="Tất cả danh mục" IsSelected="True"/>
                     <ComboBoxItem Content="Thu nhập"/>
                     <ComboBoxItem Content="Chi tiêu"/>

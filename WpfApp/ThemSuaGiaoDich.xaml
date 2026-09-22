@@ -29,7 +29,7 @@
             <!-- Căn lề phải để nhập số dễ nhìn -->
             <TextBox x:Name="txtSoTien" Height="45" Padding="10,0" FontSize="18" FontWeight="Bold" 
                      VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Margin="0,0,0,15"
-                     BorderBrush="#CBD5E1" Text="0" TextChanged="txtSoTien_TextChanged"/>
+                     BorderBrush="#CBD5E1" Tag="0" TextChanged="txtSoTien_TextChanged"/>
 
             <!-- Chọn Loại giao dịch (Thu / Chi) -->
             <TextBlock Text="Loại giao dịch:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
@@ -51,10 +51,8 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox x:Name="cboDanhMuc" Grid.Column="0" Height="40" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,10,0" BorderBrush="#CBD5E1" SelectionChanged="cboDanhMuc_SelectionChanged">
-                    <ComboBoxItem Content="Ăn uống" IsSelected="True"/>
-                    <ComboBoxItem Content="Đi lại"/>
-                    <ComboBoxItem Content="Tiền lương"/>
+                <ComboBox x:Name="cboDanhMuc" Grid.Column="0" Height="40" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,10,0" BorderBrush="#CBD5E1" DisplayMemberPath="TenDanhMuc" SelectedValuePath="MaDanhMuc" SelectionChanged="cboDanhMuc_SelectionChanged">
+                    
                 </ComboBox>
 
                 <Button x:Name="btnQuanLyDanhMuc" Grid.Column="1" Content="⚙️ Quản lý" Width="90" Height="40" 
@@ -74,7 +72,7 @@
             <TextBlock Text="Ghi chú:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
             <TextBox x:Name="txtGhiChu" Height="80" Padding="10" TextWrapping="Wrap" AcceptsReturn="True" 
                      VerticalScrollBarVisibility="Auto" FontSize="14" BorderBrush="#CBD5E1" 
-                     Text="Nhập mô tả cho giao dịch này..."/>
+                     Tag="Nhập mô tả cho giao dịch này..." TextChanged="txtGhiChu_TextChanged"/>
 
         </StackPanel>
 
