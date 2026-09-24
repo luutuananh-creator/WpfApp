@@ -52,26 +52,34 @@
             </Grid.ColumnDefinitions>
 
             <!-- Cụm Tìm kiếm & Lọc (Trái) -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <!-- Ô tìm kiếm -->
-                <Border Width="220" Height="38" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Margin="0,0,10,0">
-                    <Grid>
-                        <TextBlock Text="🔍" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="#9CA3AF"/>
-                        <TextBox x:Name="txtTimKiem" Margin="32,0,10,0" BorderThickness="0" Background="Transparent" 
-                                 VerticalContentAlignment="Center" FontSize="13" TextChanged="txtTimKiem_TextChanged"/>
-                    </Grid>
-                </Border>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                <!-- Tìm kiếm text -->
+                <TextBox x:Name="txtTimKiem" Width="180" Height="36" Padding="8,0" VerticalContentAlignment="Center" 
+             Margin="0,0,10,0" TextChanged="txtTimKiem_TextChanged"/>
 
-                <!-- Lọc Thời gian -->
-                <ComboBox x:Name="cboLocThoiGian" Width="130" Height="38" VerticalContentAlignment="Center" Margin="0,0,10,0" SelectionChanged="cboLocThoiGian_SelectionChanged">
-                    <ComboBoxItem Content="Tháng này" IsSelected="True"/>
+                <!-- Lọc nhanh theo mốc -->
+                <ComboBox x:Name="cboLocThoiGian" Width="120" Height="36" VerticalContentAlignment="Center" 
+              Margin="0,0,10,0" SelectionChanged="cboLocThoiGian_SelectionChanged">
+                    <ComboBoxItem Content="Tất cả" IsSelected="True"/>
+                    <ComboBoxItem Content="Hôm nay"/>
+                    <ComboBoxItem Content="Tháng này"/>
                     <ComboBoxItem Content="Tháng trước"/>
-                    <ComboBoxItem Content="Tất cả thời gian"/>
                 </ComboBox>
 
-                <!-- Lọc Danh mục -->
-                <ComboBox x:Name="cboLocDanhMuc" Width="130" Height="38" VerticalContentAlignment="Center" SelectionChanged="cboLocDanhMuc_SelectionChanged">
-                    <ComboBoxItem Content="Tất cả danh mục" IsSelected="True"/>
+                <!-- Chọn Từ ngày -->
+                <TextBlock Text="Từ:" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="#6B7280"/>
+                <DatePicker x:Name="dpTuNgay" Width="130" Height="36" Margin="0,0,10,0" 
+                SelectedDateChanged="dpTuNgay_SelectedDateChanged"/>
+
+                <!-- Chọn Đến ngày -->
+                <TextBlock Text="Đến:" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="#6B7280"/>
+                <DatePicker x:Name="dpDenNgay" Width="130" Height="36" Margin="0,0,10,0" 
+                SelectedDateChanged="dpDenNgay_SelectedDateChanged"/>
+
+                <!-- Lọc Danh mục Thu/Chi -->
+                <ComboBox x:Name="cboLocDanhMuc" Width="110" Height="36" VerticalContentAlignment="Center" 
+              SelectionChanged="cboLocDanhMuc_SelectionChanged">
+                    <ComboBoxItem Content="Tất cả" IsSelected="True"/>
                     <ComboBoxItem Content="Thu nhập"/>
                     <ComboBoxItem Content="Chi tiêu"/>
                 </ComboBox>

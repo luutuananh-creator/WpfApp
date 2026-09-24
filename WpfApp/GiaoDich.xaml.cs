@@ -66,39 +66,35 @@ namespace WpfApp
             }
         }
 
-        
+
         private void LocDuLieu()
         {
             if (danhSachGoc == null) return;
 
             var ketQua = danhSachGoc.AsEnumerable();
 
-            // A. Lọc theo Text tìm kiếm
+            // A. Lọc theo Text tìm kiếm (Ghi chú hoặc Danh mục)
             if (txtTimKiem != null)
             {
                 string keyword = txtTimKiem.Text.ToLower().Replace("🔍", "").Trim();
                 if (!string.IsNullOrEmpty(keyword) && keyword != "nhập ghi chú...")
                 {
-                    ketQua = ketQua.Where(x => x.GhiChu.ToLower().Contains(keyword) ||
-                                               x.DanhMuc.ToLower().Contains(keyword));
+                    ketQua = ketQua.Where(x => (x.GhiChu != null && x.GhiChu.ToLower().Contains(keyword)) ||
+                                               (x.DanhMuc != null && x.DanhMuc.ToLower().Contains(keyword)));
                 }
             }
 
-            // B. Lọc theo Thời gian (Tháng này / Tháng trước / Tất cả)
-            if (cboLocThoiGian != null && cboLocThoiGian.SelectedItem != null)
+            // B. Lọc linh hoạt theo Khoảng thời gian (Từ ngày - Đến ngày)
+            if (dpTuNgay != null && dpTuNgay.SelectedDate.HasValue)
             {
-                string thoiGian = ((ComboBoxItem)cboLocThoiGian.SelectedItem).Content.ToString();
-                DateTime now = DateTime.Now;
+                DateTime tuNgay = dpTuNgay.SelectedDate.Value.Date; // 00:00:00
+                ketQua = ketQua.Where(x => x.NgayGiaoDich.Date >= tuNgay);
+            }
 
-                if (thoiGian == "Tháng này")
-                {
-                    ketQua = ketQua.Where(x => x.NgayGiaoDich.Month == now.Month && x.NgayGiaoDich.Year == now.Year);
-                }
-                else if (thoiGian == "Tháng trước")
-                {
-                    DateTime lastMonth = now.AddMonths(-1);
-                    ketQua = ketQua.Where(x => x.NgayGiaoDich.Month == lastMonth.Month && x.NgayGiaoDich.Year == lastMonth.Year);
-                }
+            if (dpDenNgay != null && dpDenNgay.SelectedDate.HasValue)
+            {
+                DateTime denNgay = dpDenNgay.SelectedDate.Value.Date; // 23:59:59
+                ketQua = ketQua.Where(x => x.NgayGiaoDich.Date <= denNgay);
             }
 
             // C. Lọc theo Phân loại (Tất cả / Thu nhập / Chi tiêu)
@@ -118,10 +114,49 @@ namespace WpfApp
             }
         }
 
-        // Các event kích hoạt hàm lọc
+        // ============ SỰ KIỆN LỌC ============
         private void txtTimKiem_TextChanged(object sender, TextChangedEventArgs e) { LocDuLieu(); }
-        private void cboLocThoiGian_SelectionChanged(object sender, SelectionChangedEventArgs e) { LocDuLieu(); }
         private void cboLocDanhMuc_SelectionChanged(object sender, SelectionChangedEventArgs e) { LocDuLieu(); }
+
+        // Khi người dùng chọn lại ngày trên DatePicker
+        private void dpTuNgay_SelectedDateChanged(object sender, SelectionChangedEventArgs e) { LocDuLieu(); }
+        private void dpDenNgay_SelectedDateChanged(object sender, SelectionChangedEventArgs e) { LocDuLieu(); }
+
+        // Sự kiện ComboBox Lọc nhanh (Tự động tính ngày và điền vào DatePicker)
+        private void cboLocThoiGian_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cboLocThoiGian.SelectedItem == null || dpTuNgay == null || dpDenNgay == null) return;
+
+            string luaChon = ((ComboBoxItem)cboLocThoiGian.SelectedItem).Content.ToString();
+            DateTime now = DateTime.Now;
+
+            switch (luaChon)
+            {
+                case "Tất cả":
+                    dpTuNgay.SelectedDate = null;
+                    dpDenNgay.SelectedDate = null;
+                    break;
+
+                case "Hôm nay":
+                    dpTuNgay.SelectedDate = now.Date;
+                    dpDenNgay.SelectedDate = now.Date;
+                    break;
+
+                case "Tháng này":
+                    dpTuNgay.SelectedDate = new DateTime(now.Year, now.Month, 1);
+                    dpDenNgay.SelectedDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+                    break;
+
+                case "Tháng trước":
+                    DateTime thangTruoc = now.AddMonths(-1);
+                    dpTuNgay.SelectedDate = new DateTime(thangTruoc.Year, thangTruoc.Month, 1);
+                    dpDenNgay.SelectedDate = new DateTime(thangTruoc.Year, thangTruoc.Month, DateTime.DaysInMonth(thangTruoc.Year, thangTruoc.Month));
+                    break;
+            }
+        }
+
+        // Các event kích hoạt hàm lọc
+       
 
         
         private void btnXoaGiaoDich_Click(object sender, RoutedEventArgs e)
