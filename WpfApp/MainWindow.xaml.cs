@@ -23,6 +23,7 @@ namespace WpfApp
         public MainWindow()
         {
             InitializeComponent();
+            MainFrame.Navigate(new TongQuan());
         }
         private void btnMenuTongQuan_Click(object sender, RoutedEventArgs e) { MainFrame.Navigate(new TongQuan()); }
         private void btnMenuGiaoDich_Click(object sender, RoutedEventArgs e) { MainFrame.Navigate(new GiaoDich()); }

@@ -5,8 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="Thêm / Sửa Mục Tiêu" Height="550" Width="450"
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#F8FAFC">
+        Title="Thêm / Sửa Mục Tiêu" Height="560" Width="450"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#F5F6FA">
+
+    <Window.Resources>
+        <!-- Style chung cho các nút bấm bo góc -->
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Grid Margin="25">
         <Grid.RowDefinitions>
@@ -19,36 +37,48 @@
         </Grid.RowDefinitions>
 
         <!-- TIÊU ĐỀ -->
-        <TextBlock Grid.Row="0" Text="THÔNG TIN MỤC TIÊU" FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,25"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+            <TextBlock Text="Thông tin mục tiêu" FontSize="22" FontWeight="Bold" Foreground="#1F2937" HorizontalAlignment="Center"/>
+            <TextBlock Text="Thiết lập mục tiêu tài chính và số tiền tích lũy của bạn" FontSize="13" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+        </StackPanel>
 
         <!-- KHU VỰC FORM NHẬP LIỆU -->
         <StackPanel Grid.Row="1">
 
             <!-- Tên mục tiêu -->
-            <TextBlock Text="Tên mục tiêu (VD: Mua Laptop, Du lịch...):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <TextBox x:Name="txtTenMucTieu" Height="45" Padding="10,0" FontSize="16" 
-                     VerticalContentAlignment="Center" Margin="0,0,0,15" BorderBrush="#CBD5E1" TextChanged="txtTenMucTieu_TextChanged"/>
+            <TextBlock Text="Tên mục tiêu:" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Height="42" Margin="0,0,0,14">
+                <TextBox x:Name="txtTenMucTieu" BorderThickness="0" Background="Transparent" 
+                         VerticalContentAlignment="Center" FontSize="14" Padding="10,0"
+                         TextChanged="txtTenMucTieu_TextChanged"/>
+            </Border>
 
             <!-- Số tiền mục tiêu -->
-            <TextBlock Text="Số tiền mục tiêu (VND):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <TextBox x:Name="txtSoTienMucTieu" Height="45" Padding="10,0" FontSize="18" FontWeight="Bold" 
-                     VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Margin="0,0,0,15"
-                     BorderBrush="#CBD5E1" Text="0" TextChanged="txtSoTienMucTieu_TextChanged"/>
+            <TextBlock Text="Số tiền mục tiêu (VND):" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Height="42" Margin="0,0,0,14">
+                <TextBox x:Name="txtSoTienMucTieu" BorderThickness="0" Background="Transparent" 
+                         VerticalContentAlignment="Center" HorizontalContentAlignment="Right" 
+                         FontSize="16" FontWeight="Bold" Padding="10,0"
+                         Text="0" TextChanged="txtSoTienMucTieu_TextChanged"/>
+            </Border>
 
             <!-- Số tiền đã tích lũy -->
-            <TextBlock Text="Số tiền đã có sẵn (VND):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <TextBox x:Name="txtDaTichLuy" Height="45" Padding="10,0" FontSize="18" FontWeight="Bold" Foreground="#10B981"
-                     VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Margin="0,0,0,15"
-                     BorderBrush="#CBD5E1" Text="0" TextChanged="txtDaTichLuy_TextChanged"/>
+            <TextBlock Text="Số tiền đã có sẵn (VND):" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Height="42" Margin="0,0,0,14">
+                <TextBox x:Name="txtDaTichLuy" BorderThickness="0" Background="Transparent" 
+                         VerticalContentAlignment="Center" HorizontalContentAlignment="Right" 
+                         FontSize="16" FontWeight="Bold" Foreground="#16A34A" Padding="10,0"
+                         Text="0" TextChanged="txtDaTichLuy_TextChanged"/>
+            </Border>
 
             <!-- Ngày dự kiến hoàn thành -->
-            <TextBlock Text="Ngày dự kiến hoàn thành:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <DatePicker x:Name="dpNgayHoanThanh" Height="40" FontSize="14" BorderBrush="#CBD5E1"/>
+            <TextBlock Text="Ngày dự kiến hoàn thành:" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <DatePicker x:Name="dpNgayHoanThanh" Height="40" FontSize="14" Margin="0,0,0,5"/>
 
         </StackPanel>
 
         <!-- KHU VỰC NÚT HÀNH ĐỘNG -->
-        <Grid Grid.Row="2" Margin="0,20,0,0">
+        <Grid Grid.Row="2" Margin="0,15,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="15"/>
@@ -56,12 +86,12 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="btnHuy" Grid.Column="0" Content="Hủy bỏ" Height="45" 
-                    Background="#94A3B8" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+            <Button x:Name="btnHuy" Grid.Column="0" Content="Hủy bỏ" Height="42" 
+                    Background="#94A3B8" Foreground="White" FontSize="14" 
                     Click="btnHuy_Click"/>
 
-            <Button x:Name="btnLuu" Grid.Column="2" Content="💾 Lưu mục tiêu" Height="45" 
-                    Background="#3B82F6" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+            <Button x:Name="btnLuu" Grid.Column="2" Content="💾 Lưu mục tiêu" Height="42" 
+                    Background="#3B82F6" Foreground="White" FontSize="14" 
                     Click="btnLuu_Click"/>
         </Grid>
     </Grid>

@@ -6,10 +6,27 @@
       xmlns:local="clr-namespace:WpfApp"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
-      Title="TongQuan">
+      Title="TongQuan" Background="#F8F9FA">
 
-    <Grid Margin="20">
-        <!-- Chia trang thành 5 dòng -->
+    <!-- Tài nguyên style cục bộ để tái sử dụng -->
+    <Page.Resources>
+        <!-- Style chung cho các nút bấm -->
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="10,5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="25">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <!-- Dòng 0: Tiêu đề -->
@@ -24,9 +41,12 @@
         </Grid.RowDefinitions>
 
         <!-- TIÊU ĐỀ -->
-        <TextBlock Grid.Row="0" Text="TỔNG QUAN TÀI CHÍNH" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Tổng quan tài chính" FontSize="26" FontWeight="Bold" Foreground="#2C3E50"/>
+            <TextBlock Text="Chào mừng bạn quay trở lại, đây là tình hình tài chính của bạn." FontSize="13" Foreground="#7F8C8D" Margin="0,4,0,0"/>
+        </StackPanel>
 
-        <!-- 3 THẺ TÓM TẮT (Tổng thu, Tổng chi, Số dư) -->
+        <!-- 3 THẺ TÓM TẮT -->
         <Grid Grid.Row="1" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -37,59 +57,70 @@
             </Grid.ColumnDefinitions>
 
             <!-- Thẻ Tổng thu -->
-            <Border Grid.Column="0" Background="#E8F5E9" Padding="15" CornerRadius="8">
+            <Border Grid.Column="0" Background="White" Padding="20" CornerRadius="12" BorderBrush="#E9ECEF" BorderThickness="1">
                 <StackPanel>
-                    <TextBlock Text="Tổng Thu" FontSize="14" Foreground="#2E7D32"/>
-                    <!-- BỔ SUNG x:Name="txtTongThu" -->
-                    <TextBlock x:Name="txtTongThu" Text="0 đ" FontSize="20" FontWeight="Bold" Foreground="#2E7D32" Margin="0,5,0,0"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📈" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBlock Text="Tổng Thu" FontSize="13" Foreground="#6C757D" FontWeight="Medium"/>
+                    </StackPanel>
+                    <TextBlock x:Name="txtTongThu" Text="0 đ" FontSize="22" FontWeight="Bold" Foreground="#2ECC71" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
 
             <!-- Thẻ Tổng chi -->
-            <Border Grid.Column="2" Background="#FFEBEE" Padding="15" CornerRadius="8">
+            <Border Grid.Column="2" Background="White" Padding="20" CornerRadius="12" BorderBrush="#E9ECEF" BorderThickness="1">
                 <StackPanel>
-                    <TextBlock Text="Tổng Chi" FontSize="14" Foreground="#C62828"/>
-                    <!-- BỔ SUNG x:Name="txtTongChi" -->
-                    <TextBlock x:Name="txtTongChi" Text="0 đ" FontSize="20" FontWeight="Bold" Foreground="#C62828" Margin="0,5,0,0"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📉" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBlock Text="Tổng Chi" FontSize="13" Foreground="#6C757D" FontWeight="Medium"/>
+                    </StackPanel>
+                    <TextBlock x:Name="txtTongChi" Text="0 đ" FontSize="22" FontWeight="Bold" Foreground="#E74C3C" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
 
             <!-- Thẻ Số dư -->
-            <Border Grid.Column="4" Background="#E3F2FD" Padding="15" CornerRadius="8">
+            <Border Grid.Column="4" Background="White" Padding="20" CornerRadius="12" BorderBrush="#E9ECEF" BorderThickness="1">
                 <StackPanel>
-                    <TextBlock Text="Số Dư" FontSize="14" Foreground="#1565C0"/>
-                    <!-- BỔ SUNG x:Name="txtSoDu" -->
-                    <TextBlock x:Name="txtSoDu" Text="0 đ" FontSize="20" FontWeight="Bold" Foreground="#1565C0" Margin="0,5,0,0"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="💰" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBlock Text="Số Dư" FontSize="13" Foreground="#6C757D" FontWeight="Medium"/>
+                    </StackPanel>
+                    <TextBlock x:Name="txtSoDu" Text="0 đ" FontSize="22" FontWeight="Bold" Foreground="#3498DB" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
         </Grid>
 
         <!-- TÌNH TRẠNG NGÂN SÁCH -->
-        <StackPanel Grid.Row="2" Margin="0,0,0,20">
-            <TextBlock Text="Tình trạng ngân sách tháng này" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+        <Border Grid.Row="2" Background="White" Padding="20" CornerRadius="12" BorderBrush="#E9ECEF" BorderThickness="1" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="Tình trạng ngân sách tháng này" FontSize="15" FontWeight="SemiBold" Foreground="#2C3E50" Margin="0,0,0,12"/>
 
-            <!-- BỔ SUNG x:Name="pbNganSach" -->
-            <ProgressBar x:Name="pbNganSach" Value="0" Maximum="100" Height="20" Foreground="#FFC107" Background="#E0E0E0"/>
+                <ProgressBar x:Name="pbNganSach" Value="0" Maximum="100" Height="10" Foreground="#3498DB" Background="#ECF0F1"/>
 
-            <!-- BỔ SUNG x:Name="txtThongTinNganSach" -->
-            <TextBlock x:Name="txtThongTinNganSach" Text="Đã chi 0% (0 / 0 đ)" FontSize="12" Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="Gray"/>
-        </StackPanel>
+                <Grid Margin="0,8,0,0">
+                    <TextBlock x:Name="txtThongTinNganSach" Text="Đã chi 0% (0 / 0 đ)" FontSize="12" Foreground="#7F8C8D"/>
+                </Grid>
+            </StackPanel>
+        </Border>
 
-        <!-- BIỂU ĐỒ (Tạm thời dùng Border) -->
-        <Border Grid.Row="3" Background="#FAFAFA" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Margin="0,0,0,20">
-            <TextBlock Text="[Khu vực hiển thị Biểu đồ tổng quan]" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray"/>
+        <!-- BIỂU ĐỒ -->
+        <Border Grid.Row="3" Background="White" BorderBrush="#E9ECEF" BorderThickness="1" CornerRadius="12" Margin="0,0,0,20" MinHeight="150">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="📊" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                <TextBlock Text="[Khu vực hiển thị Biểu đồ tổng quan]" Foreground="#ADB5BD" FontWeight="Medium"/>
+            </StackPanel>
         </Border>
 
         <!-- CÁC NÚT HÀNH ĐỘNG -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="btnXemGiaoDich" Content="Xem Giao dịch" Width="130" Height="40" Margin="0,0,15,0" 
-                    Background="#0078D7" Foreground="White" Click="btnXemGiaoDich_Click"/>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="btnXemGiaoDich" Content="Xem Giao dịch" Width="130" Height="38" Margin="0,0,10,0" 
+                    Background="#3498DB" Foreground="White" Click="btnXemGiaoDich_Click"/>
 
-            <Button x:Name="btnXemNganSach" Content="Xem Ngân sách" Width="130" Height="40" Margin="0,0,15,0" 
-                    Background="#0078D7" Foreground="White" Click="btnXemNganSach_Click"/>
+            <Button x:Name="btnXemNganSach" Content="Xem Ngân sách" Width="130" Height="38" Margin="0,0,10,0" 
+                    Background="#2ECC71" Foreground="White" Click="btnXemNganSach_Click"/>
 
-            <Button x:Name="btnXemPhanTich" Content="Xem Phân tích" Width="130" Height="40" 
-                    Background="#0078D7" Foreground="White" Click="btnXemPhanTich_Click"/>
+            <Button x:Name="btnXemPhanTich" Content="Xem Phân tích" Width="130" Height="38" 
+                    Background="#9B59B6" Foreground="White" Click="btnXemPhanTich_Click"/>
         </StackPanel>
     </Grid>
 </Page>

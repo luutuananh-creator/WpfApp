@@ -5,8 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="Thêm / Sửa Giao Dịch" Height="650" Width="450"
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#F8FAFC">
+        Title="Thêm / Sửa Giao Dịch" Height="680" Width="460"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#F5F6FA">
+
+    <Window.Resources>
+        <!-- Style chung cho các nút bấm bo góc -->
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Grid Margin="25">
         <Grid.RowDefinitions>
@@ -19,65 +37,70 @@
         </Grid.RowDefinitions>
 
         <!-- TIÊU ĐỀ -->
-        <TextBlock Grid.Row="0" Text="CHI TIẾT GIAO DỊCH" FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" Margin="0,0,0,25"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+            <TextBlock Text="Chi tiết giao dịch" FontSize="22" FontWeight="Bold" Foreground="#1F2937" HorizontalAlignment="Center"/>
+            <TextBlock Text="Nhập thông tin chi tiết cho khoản thu hoặc chi của bạn" FontSize="13" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+        </StackPanel>
 
         <!-- KHU VỰC FORM NHẬP LIỆU -->
         <StackPanel Grid.Row="1">
 
-            <!-- Nhập Số tiền -->
-            <TextBlock Text="Số tiền (VND):" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <!-- Căn lề phải để nhập số dễ nhìn -->
-            <TextBox x:Name="txtSoTien" Height="45" Padding="10,0" FontSize="18" FontWeight="Bold" 
-                     VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Margin="0,0,0,15"
-                     BorderBrush="#CBD5E1" Tag="0" TextChanged="txtSoTien_TextChanged"/>
+            <!-- Nhập Số tiền (Bọc Border bo góc) -->
+            <TextBlock Text="Số tiền (VND):" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Height="42" Margin="0,0,0,14">
+                <TextBox x:Name="txtSoTien" BorderThickness="0" Background="Transparent" 
+                         VerticalContentAlignment="Center" HorizontalContentAlignment="Right" 
+                         FontSize="16" FontWeight="Bold" Padding="10,0"
+                         TextChanged="txtSoTien_TextChanged"/>
+            </Border>
 
             <!-- Chọn Loại giao dịch (Thu / Chi) -->
-            <TextBlock Text="Loại giao dịch:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+            <TextBlock Text="Loại giao dịch:" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
                 <RadioButton x:Name="radChiTieu" Content="Chi tiêu (-)" IsChecked="True" Foreground="#EF4444" FontWeight="Bold" FontSize="14" Margin="0,0,30,0" Checked="radChiTieu_Checked"/>
                 <RadioButton x:Name="radThuNhap" Content="Thu nhập (+)" Foreground="#10B981" FontWeight="Bold" FontSize="14" Checked="radThuNhap_Checked"/>
             </StackPanel>
 
             <!-- Chọn Ngày -->
-            <TextBlock Text="Ngày giao dịch:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <!-- Sử dụng DatePicker mặc định của WPF -->
-            <DatePicker x:Name="dpNgay" Height="40" FontSize="14" Margin="0,0,0,15" BorderBrush="#CBD5E1"/>
+            <TextBlock Text="Ngày giao dịch:" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <DatePicker x:Name="dpNgay" Height="40" FontSize="14" Margin="0,0,0,14"/>
 
             <!-- Chọn Danh mục & Nút Quản lý -->
-            <TextBlock Text="Danh mục:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <Grid Margin="0,0,0,15">
+            <TextBlock Text="Danh mục:" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <Grid Margin="0,0,0,14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox x:Name="cboDanhMuc" Grid.Column="0" Height="40" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,10,0" BorderBrush="#CBD5E1" DisplayMemberPath="TenDanhMuc" SelectedValuePath="MaDanhMuc" SelectionChanged="cboDanhMuc_SelectionChanged">
-                    
-                </ComboBox>
+                <ComboBox x:Name="cboDanhMuc" Grid.Column="0" Height="40" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,10,0" DisplayMemberPath="TenDanhMuc" SelectedValuePath="MaDanhMuc" SelectionChanged="cboDanhMuc_SelectionChanged"/>
 
                 <Button x:Name="btnQuanLyDanhMuc" Grid.Column="1" Content="⚙️ Quản lý" Width="90" Height="40" 
-                        Background="#E2E8F0" Foreground="#334155" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"
+                        Background="#E5E7EB" Foreground="#374151" FontSize="13"
                         Click="btnQuanLyDanhMuc_Click"/>
             </Grid>
 
             <!-- Phương thức thanh toán -->
-            <TextBlock Text="Phương thức thanh toán:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <ComboBox x:Name="cboPhuongThuc" Height="40" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,0,15" BorderBrush="#CBD5E1" SelectionChanged="cboPhuongThuc_SelectionChanged">
+            <TextBlock Text="Phương thức thanh toán:" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <ComboBox x:Name="cboPhuongThuc" Height="40" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,0,14" SelectionChanged="cboPhuongThuc_SelectionChanged">
                 <ComboBoxItem Content="Tiền mặt" IsSelected="True"/>
                 <ComboBoxItem Content="Chuyển khoản ngân hàng"/>
                 <ComboBoxItem Content="Ví điện tử (MoMo, ZaloPay...)"/>
             </ComboBox>
 
             <!-- Ghi chú thêm -->
-            <TextBlock Text="Ghi chú:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
-            <TextBox x:Name="txtGhiChu" Height="80" Padding="10" TextWrapping="Wrap" AcceptsReturn="True" 
-                     VerticalScrollBarVisibility="Auto" FontSize="14" BorderBrush="#CBD5E1" 
-                     Tag="Nhập mô tả cho giao dịch này..." TextChanged="txtGhiChu_TextChanged"/>
+            <TextBlock Text="Ghi chú:" FontWeight="Medium" Foreground="#374151" FontSize="13" Margin="0,0,0,5"/>
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Height="70" Margin="0,0,0,5">
+                <TextBox x:Name="txtGhiChu" BorderThickness="0" Background="Transparent" 
+                         Padding="10,8" TextWrapping="Wrap" AcceptsReturn="True" 
+                         VerticalScrollBarVisibility="Auto" FontSize="13"
+                         TextChanged="txtGhiChu_TextChanged"/>
+            </Border>
 
         </StackPanel>
 
         <!-- KHU VỰC NÚT HÀNH ĐỘNG -->
-        <Grid Grid.Row="2" Margin="0,20,0,0">
+        <Grid Grid.Row="2" Margin="0,15,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="15"/>
@@ -85,12 +108,12 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="btnHuy" Grid.Column="0" Content="Hủy bỏ" Height="45" 
-                    Background="#94A3B8" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+            <Button x:Name="btnHuy" Grid.Column="0" Content="Hủy bỏ" Height="42" 
+                    Background="#94A3B8" Foreground="White" FontSize="14" 
                     Click="btnHuy_Click"/>
 
-            <Button x:Name="btnLuu" Grid.Column="2" Content="💾 Lưu giao dịch" Height="45" 
-                    Background="#3B82F6" Foreground="White" FontWeight="Bold" FontSize="15" BorderThickness="0" Cursor="Hand" 
+            <Button x:Name="btnLuu" Grid.Column="2" Content="💾 Lưu giao dịch" Height="42" 
+                    Background="#3B82F6" Foreground="White" FontSize="14" 
                     Click="btnLuu_Click"/>
         </Grid>
     </Grid>

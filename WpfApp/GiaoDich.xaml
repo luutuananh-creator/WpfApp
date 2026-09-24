@@ -6,9 +6,27 @@
       xmlns:local="clr-namespace:WpfApp"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
-      Title="GiaoDich">
+      Title="GiaoDich" Background="#F5F6FA">
 
-    <Grid Margin="20">
+    <Page.Resources>
+        <!-- Style chung cho các nút bấm -->
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="25">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <!-- Dòng 0: Tiêu đề -->
@@ -21,32 +39,38 @@
         </Grid.RowDefinitions>
 
         <!-- TIÊU ĐỀ -->
-        <TextBlock Grid.Row="0" Text="QUẢN LÝ GIAO DỊCH" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+            <TextBlock Text="Quản lý giao dịch" FontSize="24" FontWeight="Bold" Foreground="#1F2937"/>
+            <TextBlock Text="Theo dõi và ghi nhận toàn bộ các khoản thu chi của bạn" FontSize="13" Foreground="#6B7280" Margin="0,4,0,0"/>
+        </StackPanel>
 
         <!-- THANH CÔNG CỤ TÌM KIẾM & BỘ LỌC & AI -->
         <Grid Grid.Row="1" Margin="0,0,0,15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <!-- Vùng tìm kiếm và lọc -->
                 <ColumnDefinition Width="Auto"/>
-                <!-- Vùng nút AI -->
             </Grid.ColumnDefinitions>
 
             <!-- Cụm Tìm kiếm & Lọc (Trái) -->
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <!-- Ô tìm kiếm -->
-                <TextBox x:Name="txtTimKiem"  Width="200" Height="35" Padding="10,8" Margin="0,0,10,0" 
-                         VerticalContentAlignment="Center" Tag="🔍 " TextChanged="txtTimKiem_TextChanged"/>
+                <Border Width="220" Height="38" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Margin="0,0,10,0">
+                    <Grid>
+                        <TextBlock Text="🔍" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="#9CA3AF"/>
+                        <TextBox x:Name="txtTimKiem" Margin="32,0,10,0" BorderThickness="0" Background="Transparent" 
+                                 VerticalContentAlignment="Center" FontSize="13" TextChanged="txtTimKiem_TextChanged"/>
+                    </Grid>
+                </Border>
 
                 <!-- Lọc Thời gian -->
-                <ComboBox x:Name="cboLocThoiGian" Width="120" Height="35" VerticalContentAlignment="Center" Margin="0,0,10,0" SelectionChanged="cboLocThoiGian_SelectionChanged">
+                <ComboBox x:Name="cboLocThoiGian" Width="130" Height="38" VerticalContentAlignment="Center" Margin="0,0,10,0" SelectionChanged="cboLocThoiGian_SelectionChanged">
                     <ComboBoxItem Content="Tháng này" IsSelected="True"/>
                     <ComboBoxItem Content="Tháng trước"/>
                     <ComboBoxItem Content="Tất cả thời gian"/>
                 </ComboBox>
 
                 <!-- Lọc Danh mục -->
-                <ComboBox x:Name="cboLocDanhMuc" Width="120" Height="35" VerticalContentAlignment="Center" SelectionChanged="cboLocDanhMuc_SelectionChanged">
+                <ComboBox x:Name="cboLocDanhMuc" Width="130" Height="38" VerticalContentAlignment="Center" SelectionChanged="cboLocDanhMuc_SelectionChanged">
                     <ComboBoxItem Content="Tất cả danh mục" IsSelected="True"/>
                     <ComboBoxItem Content="Thu nhập"/>
                     <ComboBoxItem Content="Chi tiêu"/>
@@ -55,65 +79,72 @@
 
             <!-- Cụm nút AI (Phải) -->
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button x:Name="btnQuetHoaDon" Content="📷 Quét hóa đơn" Height="35" Padding="15,0" Margin="0,0,10,0"
-                        Background="#8B5CF6" Foreground="White" BorderThickness="0" Cursor="Hand"
-                        Click="btnQuetHoaDon_Click"/>
+                <Button x:Name="btnQuetHoaDon" Content="📷 Quét hóa đơn" Width="130" Height="38" Margin="0,0,10,0"
+                        Background="#8B5CF6" Foreground="White" Click="btnQuetHoaDon_Click"/>
 
-                <Button x:Name="btnNhapBangAI" Content="✨ Nhập bằng AI" Height="35" Padding="15,0"
-                        Background="#6366F1" Foreground="White" BorderThickness="0" Cursor="Hand"
-                        Click="btnNhapBangAI_Click"/>
+                <Button x:Name="btnNhapBangAI" Content="✨ Nhập bằng AI" Width="130" Height="38"
+                        Background="#6366F1" Foreground="White" Click="btnNhapBangAI_Click"/>
             </StackPanel>
         </Grid>
 
         <!-- BẢNG DỮ LIỆU (DATAGRID) -->
-        <DataGrid x:Name="dgvGiaoDich" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" 
-                  HeadersVisibility="Column" Background="White" RowHeight="35" ColumnHeaderHeight="40"
-                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E2E8F0" BorderBrush="#CBD5E1">
-            <DataGrid.Columns>
-                <!-- Cột Ngày -->
-                <DataGridTextColumn Header="Ngày" Binding="{Binding Ngay}" Width="100"/>
-                <!-- Cột Phân loại (Thu/Chi) -->
-                <DataGridTextColumn Header="Loại" Binding="{Binding Loai}" Width="80"/>
-                <!-- Cột Danh mục -->
-                <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMuc}" Width="150"/>
-                <!-- Cột Ghi chú -->
-                <DataGridTextColumn Header="Ghi chú" Binding="{Binding GhiChu}" Width="*"/>
-                <!-- Cột Số tiền (Căn phải để số dễ đọc) -->
-                <DataGridTextColumn Header="Số tiền" Binding="{Binding SoTien}" Width="120">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Margin" Value="0,0,10,0"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Border Grid.Row="2" Background="White" CornerRadius="12" BorderBrush="#E5E7EB" BorderThickness="1" Padding="1">
+            <DataGrid x:Name="dgvGiaoDich" AutoGenerateColumns="False" CanUserAddRows="False" 
+                      CanUserDeleteRows="False" CanUserResizeRows="False"
+                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F3F4F6" 
+                      BorderThickness="0" Background="Transparent" RowHeight="45" ColumnHeaderHeight="42"
+                      FontSize="14" SelectionMode="Single" SelectionUnit="FullRow">
+
+                <!-- Style tiêu đề cột -->
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#F9FAFB"/>
+                        <Setter Property="Foreground" Value="#374151"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Padding" Value="12,0"/>
+                        <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ngày" Binding="{Binding Ngay}" Width="110"/>
+                    <DataGridTextColumn Header="Loại" Binding="{Binding Loai}" Width="90"/>
+                    <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMuc}" Width="160"/>
+                    <DataGridTextColumn Header="Ghi chú" Binding="{Binding GhiChu}" Width="*"/>
+                    <DataGridTextColumn Header="Số tiền" Binding="{Binding SoTien}" Width="130">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="Margin" Value="0,0,12,0"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Foreground" Value="#111827"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
 
         <!-- THANH NÚT HÀNH ĐỘNG DƯỚI CÙNG -->
         <Grid Grid.Row="3" Margin="0,15,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <!-- Nút Thêm bên trái -->
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <!-- Nút Sửa/Xóa bên phải -->
             </Grid.ColumnDefinitions>
 
-            <!-- Nút Thêm mới (Chính) -->
-            <Button x:Name="btnThemGiaoDich" Grid.Column="0" Content="➕ Thêm Giao dịch" Height="40" Padding="20,0" 
-                    Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"
-                    Click="btnThemGiaoDich_Click"/>
+            <!-- Nút Thêm mới -->
+            <Button x:Name="btnThemGiaoDich" Grid.Column="0" Content="➕ Thêm Giao dịch" Width="150" Height="40" 
+                    Background="#10B981" Foreground="White" FontWeight="Bold" Click="btnThemGiaoDich_Click"/>
 
-            <!-- Nút Sửa / Xóa (Phụ) -->
+            <!-- Nút Sửa / Xóa -->
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <Button x:Name="btnSuaGiaoDich" Content="✏️ Sửa" Height="40" Width="90" Margin="0,0,10,0"
-                        Background="#F59E0B" Foreground="White" BorderThickness="0" Cursor="Hand"
-                        Click="btnSuaGiaoDich_Click"/>
+                <Button x:Name="btnSuaGiaoDich" Content="✏️ Sửa" Width="95" Height="40" Margin="0,0,10,0"
+                        Background="#F59E0B" Foreground="White" Click="btnSuaGiaoDich_Click"/>
 
-                <Button x:Name="btnXoaGiaoDich" Content="🗑️ Xóa" Height="40" Width="90"
-                        Background="#EF4444" Foreground="White" BorderThickness="0" Cursor="Hand"
-                        Click="btnXoaGiaoDich_Click"/>
+                <Button x:Name="btnXoaGiaoDich" Content="🗑️ Xóa" Width="95" Height="40"
+                        Background="#EF4444" Foreground="White" Click="btnXoaGiaoDich_Click"/>
             </StackPanel>
         </Grid>
     </Grid>
