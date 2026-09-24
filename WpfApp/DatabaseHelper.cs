@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;    // ⚠️ ĐỔI TỪ Microsoft.Data.SqlClient → System.Data.SqlClient
+using System.Data.SqlClient;    
 
 namespace WpfApp
 {

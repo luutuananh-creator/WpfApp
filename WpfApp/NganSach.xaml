@@ -86,18 +86,22 @@
                 </DataGridTextColumn>
 
                 <!-- Cột THANH TIẾN TRÌNH (Sử dụng TemplateColumn để vẽ ProgressBar) -->
-                <DataGridTemplateColumn Header="Tiến độ sử dụng" Width="200">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Grid Margin="10,0,10,0" VerticalAlignment="Center">
-                                <!-- Thanh Progress (Phần trăm sẽ được bind sau) -->
-                                <ProgressBar Value="60" Maximum="100" Height="15" Foreground="#F59E0B" Background="#E2E8F0"/>
-                                <!-- Chữ % hiển thị đè lên thanh progress (Tùy chọn) -->
-                                <TextBlock Text="60%" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10" FontWeight="Bold"/>
-                            </Grid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+               <!-- Cột THANH TIẾN TRÌNH -->
+<DataGridTemplateColumn Header="Tiến độ sử dụng" Width="220">
+    <DataGridTemplateColumn.CellTemplate>
+        <DataTemplate>
+            <Grid Margin="10,0,10,0" VerticalAlignment="Center">
+                <!-- Thanh Progress Bind động Value và Màu sắc -->
+                <ProgressBar Value="{Binding PhanTramDung}" Maximum="100" Height="18" 
+                             Foreground="{Binding MauTienDo}" Background="#E2E8F0"/>
+                
+                <!-- Hiển thị % chữ -->
+                <TextBlock Text="{Binding PhanTramHienThi}" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                           FontSize="11" FontWeight="Bold" Foreground="#1E293B"/>
+            </Grid>
+        </DataTemplate>
+    </DataGridTemplateColumn.CellTemplate>
+</DataGridTemplateColumn>
 
                 <!-- Cột Còn lại -->
                 <DataGridTextColumn Header="Còn lại" Binding="{Binding ConLai}" Width="*">

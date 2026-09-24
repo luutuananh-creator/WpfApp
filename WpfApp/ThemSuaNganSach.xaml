@@ -1,12 +1,49 @@
 ﻿<Window x:Class="WpfApp.ThemSuaNganSach"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp"
-        mc:Ignorable="d"
-        Title="ThemSuaNganSach" Height="450" Width="800">
-    <Grid>
-        
+        Title="Thiết lập Ngân sách" Height="380" Width="420"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <StackPanel>
+            <!-- Tiêu đề biến đổi động (Thêm/Sửa) -->
+            <TextBlock x:Name="txtTieuDe" Text="THÊM NGÂN SÁCH MỚI" FontSize="18" FontWeight="Bold" 
+                       Foreground="#10B981" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+            <!-- Chọn Danh mục -->
+            <TextBlock Text="Danh mục chi tiêu:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <ComboBox x:Name="cboDanhMuc" Height="35" VerticalContentAlignment="Center" Margin="0,0,0,15" DisplayMemberPath="TenDanhMuc" SelectedValuePath="MaDanhMuc"/>
+
+            <!-- Nhập Hạn mức -->
+            <TextBlock Text="Hạn mức tối đa (VNĐ):" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtHanMuc" Height="35" VerticalContentAlignment="Center" Padding="5,0" Margin="0,0,0,15"/>
+
+            <!-- Chọn Tháng & Năm -->
+            <Grid Margin="0,0,0,25">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Tháng:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="cboThang" Height="35" VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Năm:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="txtNam" Height="35" VerticalContentAlignment="Center" Padding="5,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Nút Lưu / Hủy -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="btnHuy" Content="Hủy" Width="90" Height="35" Margin="0,0,10,0" 
+                        Background="#94A3B8" Foreground="White" BorderThickness="0" Click="btnHuy_Click"/>
+                <Button x:Name="btnLuu" Content="Lưu lại" Width="100" Height="35" 
+                        Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="btnLuu_Click"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Window>
