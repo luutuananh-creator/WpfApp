@@ -10,7 +10,7 @@ namespace WpfApp
     public class GroqHelper
     {
         
-        private static readonly string ApiKey = "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";
+        private static readonly string ApiKey = "";
         private static readonly string ApiUrl = "https://api.groq.com/openai/v1/chat/completions";
 
         public static async Task<string> GuiYeuCauPhanTich(string prompt)

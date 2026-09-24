@@ -1,23 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Data.SqlClient;
+
 namespace WpfApp
 {
     public partial class NganSach : Page
     {
         private string connectionString = @"Server=(LocalDB)\MSSQLLocalDB;Database=QuanLyTaiChinhAI;Trusted_Connection=True;";
+        private bool isLoaded = false; // Cờ tránh gọi sự kiện khi UI đang khởi tạo
 
         public NganSach()
         {
@@ -27,11 +20,24 @@ namespace WpfApp
 
         private void NganSach_Loaded(object sender, RoutedEventArgs e)
         {
+            InitThangNam();
             LoadDanhMucIntoComboBox();
+            isLoaded = true; // Đã load xong UI
             TaiDanhSachNganSach();
         }
 
-        #region 1. MODEL DÙNG ĐỂ BINDING LÊN DATAGRID
+        private void InitThangNam()
+        {
+            cboLocThang.Items.Clear();
+            for (int i = 1; i <= 12; i++)
+            {
+                cboLocThang.Items.Add($"Tháng {i}");
+            }
+            cboLocThang.SelectedIndex = DateTime.Now.Month - 1;
+            txtLocNam.Text = DateTime.Now.Year.ToString();
+        }
+
+        #region 1. MODEL BINDING
         public class NganSachViewModel
         {
             public int MaNganSach { get; set; }
@@ -40,29 +46,25 @@ namespace WpfApp
             public decimal HanMuc { get; set; }
             public decimal DaChi { get; set; }
 
-            // Các thuộc tính tự tính toán
             public decimal ConLai => HanMuc - DaChi;
-
             public double PhanTramDung => HanMuc > 0 ? (double)(DaChi / HanMuc * 100) : 0;
-
             public string PhanTramHienThi => $"{Math.Round(PhanTramDung, 1)}%";
 
-            // Đổi màu thanh tiến độ: Xanh (<80%), Cam (80%-100%), Đỏ (>100%)
             public SolidColorBrush MauTienDo
             {
                 get
                 {
                     if (PhanTramDung >= 100)
-                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444")); // Đỏ (Vượt hạn mức)
+                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444"));
                     if (PhanTramDung >= 80)
-                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B")); // Cam (Cảnh báo 80%)
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));     // Xanh (An toàn)
+                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"));
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
                 }
             }
         }
         #endregion
 
-        #region 2. TẢI DỮ LIỆU TỪ DATABASE
+        #region 2. TẢI DỮ LIỆU VÀ LỌC
         private void LoadDanhMucIntoComboBox()
         {
             try
@@ -70,9 +72,10 @@ namespace WpfApp
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    // Lấy các danh mục Chi tiêu
-                    string query = "SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc";
+                    string query = "SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc WHERE MaNguoiDung = @MaNguoiDung";
                     SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", DangNhap.MaNguoiDungHienTai);
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     cboLocDanhMuc.Items.Clear();
@@ -96,11 +99,21 @@ namespace WpfApp
 
         private void TaiDanhSachNganSach()
         {
+            if (!isLoaded) return;
+
             List<NganSachViewModel> list = new List<NganSachViewModel>();
 
-            // Lấy tháng và năm hiện tại (Hoặc dựa theo cboLocThang)
-            int thang = DateTime.Now.Month;
-            int nam = DateTime.Now.Year;
+            // Lấy giá trị Tháng/Năm từ Bộ lọc
+            int thang = cboLocThang.SelectedIndex + 1;
+            int.TryParse(txtLocNam.Text, out int nam);
+            if (nam <= 0) nam = DateTime.Now.Year;
+
+            // Lấy ID Danh Mục từ Bộ lọc
+            int maDanhMucLoc = 0;
+            if (cboLocDanhMuc.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null)
+            {
+                maDanhMucLoc = Convert.ToInt32(selectedItem.Tag);
+            }
 
             try
             {
@@ -108,7 +121,7 @@ namespace WpfApp
                 {
                     conn.Open();
 
-                    // SQL Query: Lấy hạn mức từ NganSach + Tự động SUM(SoTien) chi tiêu từ bảng GiaoDich trong cùng Tháng/Năm
+                    // Chuỗi SQL truy vấn động
                     string query = @"
                         SELECT 
                             ns.MaNganSach,
@@ -121,12 +134,26 @@ namespace WpfApp
                         LEFT JOIN GiaoDich gd ON gd.MaDanhMuc = ns.MaDanhMuc 
                                              AND MONTH(gd.NgayGiaoDich) = ns.Thang 
                                              AND YEAR(gd.NgayGiaoDich) = ns.Nam
-                        WHERE ns.Thang = @Thang AND ns.Nam = @Nam
-                        GROUP BY ns.MaNganSach, ns.MaDanhMuc, dm.TenDanhMuc, ns.HanMuc";
+                        WHERE ns.Thang = @Thang 
+                          AND ns.Nam = @Nam 
+                          AND ns.MaNguoiDung = @MaNguoiDung";
+
+                    // Thêm điều kiện nếu chọn danh mục cụ thể
+                    if (maDanhMucLoc > 0)
+                    {
+                        query += " AND ns.MaDanhMuc = @MaDanhMucLoc";
+                    }
+
+                    query += " GROUP BY ns.MaNganSach, ns.MaDanhMuc, dm.TenDanhMuc, ns.HanMuc";
 
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@Thang", thang);
                     cmd.Parameters.AddWithValue("@Nam", nam);
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", DangNhap.MaNguoiDungHienTai);
+                    if (maDanhMucLoc > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@MaDanhMucLoc", maDanhMucLoc);
+                    }
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
@@ -142,7 +169,6 @@ namespace WpfApp
                     }
                 }
 
-                // Đổ dữ liệu vào DataGrid
                 dgvNganSach.ItemsSource = list;
             }
             catch (Exception ex)
@@ -151,34 +177,45 @@ namespace WpfApp
             }
         }
         #endregion
-                
-        #region 3. SỰ KIỆN NÚT BẤM (CÁC HÀNH ĐỘNG)
 
-        // Nút Thêm/Thiết lập Ngân sách mới
-        // Khi bấm nút THÊM
+        #region 3. SỰ KIỆN THAY ĐỔI BỘ LỌC
+        private void cboFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TaiDanhSachNganSach();
+        }
+
+        private void txtLocNam_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TaiDanhSachNganSach();
+        }
+        #endregion
+
+        #region 4. SỰ KIỆN NÚT BẤM (THÊM, SỬA, XÓA)
         private void btnThemNganSach_Click(object sender, RoutedEventArgs e)
         {
-            ThemSuaNganSach popup = new ThemSuaNganSach(0); // Truyền 0 để Thêm
+            ThemSuaNganSach popup = new ThemSuaNganSach(0);
             if (popup.ShowDialog() == true)
             {
-                TaiDanhSachNganSach(); // Refresh lại DataGrid sau khi Thêm thành công
+                TaiDanhSachNganSach();
             }
         }
 
-        // Khi bấm nút SỬA
         private void btnSuaNganSach_Click(object sender, RoutedEventArgs e)
         {
             if (dgvNganSach.SelectedItem is NganSachViewModel itemChon)
             {
-                ThemSuaNganSach popup = new ThemSuaNganSach(itemChon.MaNganSach); // Truyền ID để Sửa
+                ThemSuaNganSach popup = new ThemSuaNganSach(itemChon.MaNganSach);
                 if (popup.ShowDialog() == true)
                 {
-                    TaiDanhSachNganSach(); // Refresh lại DataGrid sau khi Sửa thành công
+                    TaiDanhSachNganSach();
                 }
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn một dòng ngân sách để sửa!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
-        // Nút Xóa ngân sách
         private void btnXoaNganSach_Click(object sender, RoutedEventArgs e)
         {
             if (dgvNganSach.SelectedItem is NganSachViewModel itemChon)
@@ -200,7 +237,7 @@ namespace WpfApp
                         }
 
                         MessageBox.Show("Đã xóa thành công!", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
-                        TaiDanhSachNganSach(); // Tải lại danh sách
+                        TaiDanhSachNganSach();
                     }
                     catch (Exception ex)
                     {
@@ -213,20 +250,7 @@ namespace WpfApp
                 MessageBox.Show("Vui lòng chọn một dòng ngân sách để xóa!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-
-        // Nút Xem giao dịch phát sinh của danh mục đó
-        private void btnXemGiaoDich_Click(object sender, RoutedEventArgs e)
-        {
-            if (dgvNganSach.SelectedItem is NganSachViewModel itemChon)
-            {
-                MessageBox.Show($"Xem danh sách các hóa đơn chi tiêu thuộc danh mục '{itemChon.TenDanhMuc}' trong tháng.",
-                                "Xem giao dịch", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                MessageBox.Show("Vui lòng chọn một danh mục để xem chi tiết giao dịch!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
         #endregion
     }
+
 }
