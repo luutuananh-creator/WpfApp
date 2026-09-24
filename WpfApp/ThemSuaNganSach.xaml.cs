@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
 using System.Windows;
-using Microsoft.Data.SqlClient;
 
 namespace WpfApp
 {
@@ -17,7 +18,11 @@ namespace WpfApp
             _maNganSach = maNganSach;
             this.Loaded += ThemSuaNganSach_Loaded;
         }
-
+        private void txtHanMuc_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            // Chỉ cho phép nhập số
+            e.Handled = !System.Text.RegularExpressions.Regex.IsMatch(e.Text, @"^[0-9]+$");
+        }
         private void ThemSuaNganSach_Loaded(object sender, RoutedEventArgs e)
         {
             LoadDanhMuc();
@@ -41,7 +46,38 @@ namespace WpfApp
 
         private void LoadDanhMuc()
         {
-            // Code load danh mục chi tiêu từ bảng DanhMuc lên cboDanhMuc
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    // Lấy các danh mục của người dùng hiện tại (hoặc lọc theo LoaiDanhMuc = N'Chi tiêu' nếu cần)
+                    string query = "SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc WHERE MaNguoiDung = @MaNguoiDung";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", _currentUserId);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    // Nếu bạn dùng Binding qua DisplayMemberPath và SelectedValuePath trong XAML:
+                    var listDanhMuc = new List<DanhMucModel>();
+                    while (reader.Read())
+                    {
+                        listDanhMuc.Add(new DanhMucModel
+                        {
+                            MaDanhMuc = Convert.ToInt32(reader["MaDanhMuc"]),
+                            TenDanhMuc = reader["TenDanhMuc"].ToString()
+                        });
+                    }
+
+                    cboDanhMuc.ItemsSource = listDanhMuc;
+                    cboDanhMuc.DisplayMemberPath = "TenDanhMuc";
+                    cboDanhMuc.SelectedValuePath = "MaDanhMuc";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi load danh mục: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadDataChiTiet()

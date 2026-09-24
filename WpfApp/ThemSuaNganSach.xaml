@@ -1,49 +1,109 @@
 ﻿<Window x:Class="WpfApp.ThemSuaNganSach"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Thiết lập Ngân sách" Height="380" Width="420"
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Thiết Lập Ngân Sách" Height="420" Width="450"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#F9FAFB">
 
-    <Grid Margin="20">
-        <StackPanel>
-            <!-- Tiêu đề biến đổi động (Thêm/Sửa) -->
-            <TextBlock x:Name="txtTieuDe" Text="THÊM NGÂN SÁCH MỚI" FontSize="18" FontWeight="Bold" 
-                       Foreground="#10B981" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+    <Window.Resources>
+        <!-- Style Label chung -->
+        <Style TargetType="Label">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,8,0,2"/>
+        </Style>
 
-            <!-- Chọn Danh mục -->
-            <TextBlock Text="Danh mục chi tiêu:" FontWeight="SemiBold" Margin="0,0,0,5"/>
-            <ComboBox x:Name="cboDanhMuc" Height="35" VerticalContentAlignment="Center" Margin="0,0,0,15" DisplayMemberPath="TenDanhMuc" SelectedValuePath="MaDanhMuc"/>
+        <!-- Style ComboBox & TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
 
-            <!-- Nhập Hạn mức -->
-            <TextBlock Text="Hạn mức tối đa (VNĐ):" FontWeight="SemiBold" Margin="0,0,0,5"/>
-            <TextBox x:Name="txtHanMuc" Height="35" VerticalContentAlignment="Center" Padding="5,0" Margin="0,0,0,15"/>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </Window.Resources>
 
-            <!-- Chọn Tháng & Năm -->
-            <Grid Margin="0,0,0,25">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Tiêu đề -->
+            <RowDefinition Height="*"/>
+            <!-- Form nhập liệu -->
+            <RowDefinition Height="Auto"/>
+            <!-- Các nút bấm -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. TIÊU ĐỀ -->
+        <TextBlock x:Name="txtTieuDe" 
+                   Text="THÊM NGÂN SÁCH MỚI" 
+                   FontSize="18" 
+                   FontWeight="Bold" 
+                   Foreground="#10B981" 
+                   HorizontalAlignment="Center" 
+                   Margin="0,0,0,16"/>
+
+        <!-- 2. FORM NHẬP LIỆU -->
+        <StackPanel Grid.Row="1">
+            <!-- Chọn Danh Mục -->
+            <Label Content="Danh mục chi tiêu:"/>
+            <ComboBox x:Name="cboDanhMuc" 
+                      DisplayMemberPath="TenDanhMuc" 
+                      SelectedValuePath="MaDanhMuc"/>
+
+            <!-- Chọn Thời Gian (Tháng & Năm) -->
+            <Grid Margin="0,4,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="Tháng:" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                    <ComboBox x:Name="cboThang" Height="35" VerticalContentAlignment="Center"/>
+                    <Label Content="Tháng:"/>
+                    <ComboBox x:Name="cboThang"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2">
-                    <TextBlock Text="Năm:" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                    <TextBox x:Name="txtNam" Height="35" VerticalContentAlignment="Center" Padding="5,0"/>
+                    <Label Content="Năm:"/>
+                    <TextBox x:Name="txtNam"/>
                 </StackPanel>
             </Grid>
 
-            <!-- Nút Lưu / Hủy -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="btnHuy" Content="Hủy" Width="90" Height="35" Margin="0,0,10,0" 
-                        Background="#94A3B8" Foreground="White" BorderThickness="0" Click="btnHuy_Click"/>
-                <Button x:Name="btnLuu" Content="Lưu lại" Width="100" Height="35" 
-                        Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="btnLuu_Click"/>
-            </StackPanel>
+            <!-- Nhập Hạn Mức -->
+            <Label Content="Hạn mức ngân sách (VNĐ):"/>
+            <TextBox x:Name="txtHanMuc" PreviewTextInput="txtHanMuc_PreviewTextInput"/>
+        </StackPanel>
+
+        <!-- 3. NÚT HÀNH ĐỘNG -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="btnHuy" 
+                    Content="Hủy bỏ" 
+                    Width="100" 
+                    Height="36" 
+                    Margin="0,0,12,0" 
+                    Background="#E5E7EB" 
+                    Foreground="#374151" 
+                    BorderThickness="0" 
+                    Cursor="Hand"
+                    Click="btnHuy_Click"/>
+
+            <Button x:Name="btnLuu" 
+                    Content="Lưu thông tin" 
+                    Width="120" 
+                    Height="36" 
+                    Background="#10B981" 
+                    Foreground="White" 
+                    FontWeight="Bold" 
+                    BorderThickness="0" 
+                    Cursor="Hand"
+                    Click="btnLuu_Click"/>
         </StackPanel>
     </Grid>
 </Window>

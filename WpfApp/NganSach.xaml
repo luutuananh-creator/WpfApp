@@ -1,152 +1,82 @@
 ﻿<Page x:Class="WpfApp.NganSach"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:WpfApp"
-      mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="800"
-      Title="NganSach">
+      Title="Quản Lý Ngân Sách" Background="#F9FAFB">
 
     <Grid Margin="20">
-        <!-- CHIA TRANG THÀNH 4 DÒNG -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Dòng 0: Tiêu đề -->
-            <RowDefinition Height="Auto"/>
-            <!-- Dòng 1: Bộ lọc tháng -->
+            <!-- Thanh công cụ & Lọc -->
             <RowDefinition Height="*"/>
-            <!-- Dòng 2: Bảng danh sách ngân sách -->
-            <RowDefinition Height="Auto"/>
-            <!-- Dòng 3: Các nút hành động -->
+            <!-- Bảng dữ liệu DataGrid -->
         </Grid.RowDefinitions>
 
-        <!-- TIÊU ĐỀ -->
-        <TextBlock Grid.Row="0" Text="QUẢN LÝ NGÂN SÁCH" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
-
-        <!-- THANH CÔNG CỤ TÌM KIẾM & BỘ LỌC -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
-            <TextBlock Text="📅 Chọn tháng:" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Margin="0,0,10,0"/>
-
-            <!-- Lọc theo tháng -->
-            <ComboBox x:Name="cboLocThang" Width="150" Height="35" VerticalContentAlignment="Center" Margin="0,0,15,0">
-                <ComboBoxItem Content="Tháng này" IsSelected="True"/>
-                <ComboBoxItem Content="Tháng trước"/>
-                <ComboBoxItem Content="Tùy chọn..."/>
-            </ComboBox>
-
-            <!-- Lọc theo danh mục -->
-            <ComboBox x:Name="cboLocDanhMuc" Width="180" Height="35" VerticalContentAlignment="Center">
-                <ComboBoxItem Content="Tất cả danh mục" IsSelected="True"/>
-                <ComboBoxItem Content="Ăn uống"/>
-                <ComboBoxItem Content="Mua sắm"/>
-                <ComboBoxItem Content="Đi lại"/>
-            </ComboBox>
-        </StackPanel>
-
-        <!-- BẢNG DỮ LIỆU (DATAGRID) -->
-        <DataGrid x:Name="dgvNganSach" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" 
-                  HeadersVisibility="Column" Background="White" RowHeight="45" ColumnHeaderHeight="40"
-                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E2E8F0" BorderBrush="#CBD5E1">
-            <DataGrid.Columns>
-
-                <!-- Cột Danh mục -->
-                <DataGridTextColumn Header="Danh mục" Binding="{Binding TenDanhMuc}" Width="150">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="Margin" Value="10,0,0,0"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Cột Hạn mức -->
-                <DataGridTextColumn Header="Hạn mức" Binding="{Binding HanMuc}" Width="120">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Margin" Value="0,0,10,0"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Cột Đã chi -->
-                <DataGridTextColumn Header="Đã chi" Binding="{Binding DaChi}" Width="120">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Margin" Value="0,0,10,0"/>
-                            <Setter Property="Foreground" Value="#C62828"/>
-                            <!-- Màu đỏ -->
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Cột THANH TIẾN TRÌNH (Sử dụng TemplateColumn để vẽ ProgressBar) -->
-               <!-- Cột THANH TIẾN TRÌNH -->
-<DataGridTemplateColumn Header="Tiến độ sử dụng" Width="220">
-    <DataGridTemplateColumn.CellTemplate>
-        <DataTemplate>
-            <Grid Margin="10,0,10,0" VerticalAlignment="Center">
-                <!-- Thanh Progress Bind động Value và Màu sắc -->
-                <ProgressBar Value="{Binding PhanTramDung}" Maximum="100" Height="18" 
-                             Foreground="{Binding MauTienDo}" Background="#E2E8F0"/>
-                
-                <!-- Hiển thị % chữ -->
-                <TextBlock Text="{Binding PhanTramHienThi}" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                           FontSize="11" FontWeight="Bold" Foreground="#1E293B"/>
-            </Grid>
-        </DataTemplate>
-    </DataGridTemplateColumn.CellTemplate>
-</DataGridTemplateColumn>
-
-                <!-- Cột Còn lại -->
-                <DataGridTextColumn Header="Còn lại" Binding="{Binding ConLai}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Margin" Value="0,0,10,0"/>
-                            <Setter Property="Foreground" Value="#2E7D32"/>
-                            <!-- Màu xanh -->
-                            <Setter Property="FontWeight" Value="Bold"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <!-- THANH NÚT HÀNH ĐỘNG DƯỚI CÙNG -->
-        <Grid Grid.Row="3" Margin="0,15,0,0">
+        <!-- THANH CÔNG CỤ & BỘ LỌC -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <!-- Trái: Nút Thêm -->
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <!-- Phải: Xem giao dịch / Sửa / Xóa -->
             </Grid.ColumnDefinitions>
 
-            <!-- Nút Thêm ngân sách -->
-            <Button x:Name="btnThemNganSach" Grid.Column="0" Content="➕ Thiết lập Ngân sách" Height="40" Padding="20,0" 
-                    Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Click="btnThemNganSach_Click"/>
+            <!-- Khối Bộ Lọc (Danh Mục, Tháng, Năm) -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <!-- Lọc Danh Mục -->
+                <TextBlock Text="Danh mục:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                <ComboBox x:Name="cboLocDanhMuc" Width="160" Height="36" VerticalContentAlignment="Center" 
+                          Margin="0,0,16,0" SelectionChanged="cboFilter_SelectionChanged"/>
 
-            <!-- Cụm Nút Hành động cho ngân sách đã chọn -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <!-- Lọc Tháng -->
+                <TextBlock Text="Tháng:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                <ComboBox x:Name="cboLocThang" Width="90" Height="36" VerticalContentAlignment="Center" 
+                          Margin="0,0,16,0" SelectionChanged="cboFilter_SelectionChanged"/>
 
-                <!-- Nút Xem giao dịch của danh mục này -->
-                <Button x:Name="btnXemGiaoDich" Content="👁️ Xem giao dịch" Height="40" Padding="15,0" Margin="0,0,15,0"
-                        Background="#3B82F6" Foreground="White" BorderThickness="0" Cursor="Hand" Click="btnXemGiaoDich_Click"/>
+                <!-- Lọc Năm -->
+                <TextBlock Text="Năm:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                <TextBox x:Name="txtLocNam" Width="80" Height="36" VerticalContentAlignment="Center" 
+                         Padding="6,0" TextChanged="txtLocNam_TextChanged"/>
+            </StackPanel>
 
-                <Button x:Name="btnSuaNganSach" Content="✏️ Sửa" Height="40" Width="90" Margin="0,0,10,0"
-                        Background="#F59E0B" Foreground="White" BorderThickness="0" Cursor="Hand" Click="btnSuaNganSach_Click"/>
+            <!-- Các Nút Thêm, Sửa, Xóa -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button x:Name="btnThemNganSach" Content="+ Thêm Ngân Sách" Height="36" Padding="12,0" 
+                        Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" 
+                        Margin="0,0,8,0" Click="btnThemNganSach_Click"/>
 
-                <Button x:Name="btnXoaNganSach" Content="🗑️ Xóa" Height="40" Width="90"
-                        Background="#EF4444" Foreground="White" BorderThickness="0" Cursor="Hand" Click="btnXoaNganSach_Click"/>
+                <Button x:Name="btnSuaNganSach" Content="Sửa Hạn Mức" Height="36" Padding="12,0" 
+                        Background="#F59E0B" Foreground="White" FontWeight="Bold" BorderThickness="0" 
+                        Margin="0,0,8,0" Click="btnSuaNganSach_Click"/>
+
+                <Button x:Name="btnXoaNganSach" Content="Xóa" Height="36" Padding="12,0" 
+                        Background="#EF4444" Foreground="White" FontWeight="Bold" BorderThickness="0" 
+                        Click="btnXoaNganSach_Click"/>
             </StackPanel>
         </Grid>
+
+        <!-- BẢNG DATAGRID -->
+        <DataGrid x:Name="dgvNganSach" Grid.Row="1" AutoGenerateColumns="False" 
+                  CanUserAddRows="False" IsReadOnly="True" GridLinesVisibility="Horizontal" 
+                  Background="White" RowHeight="40" ColumnHeaderHeight="36">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Mã NS" Binding="{Binding MaNganSach}" Width="70"/>
+                <DataGridTextColumn Header="Tên Danh Mục" Binding="{Binding TenDanhMuc}" Width="*"/>
+                <DataGridTextColumn Header="Hạn Mức (VNĐ)" Binding="{Binding HanMuc, StringFormat={}{0:N0}}" Width="130"/>
+                <DataGridTextColumn Header="Đã Chi (VNĐ)" Binding="{Binding DaChi, StringFormat={}{0:N0}}" Width="130"/>
+                <DataGridTextColumn Header="Còn Lại (VNĐ)" Binding="{Binding ConLai, Mode=OneWay, StringFormat={}{0:N0}}" Width="130"/>
+
+                <!-- Thanh Tiến Độ -->
+                <DataGridTemplateColumn Header="Tiến Độ Sử Dụng" Width="180">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Margin="5,0">
+                                <ProgressBar Value="{Binding PhanTramDung, Mode=OneWay}" Maximum="100" Height="14" 
+                                             Foreground="{Binding MauTienDo, Mode=OneWay}" Background="#E5E7EB" BorderThickness="0"/>
+                                <TextBlock Text="{Binding PhanTramHienThi, Mode=OneWay}" HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="#111827"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Page>
