@@ -54,14 +54,30 @@ namespace WpfApp
 
         private void btnThem_Click(object sender, RoutedEventArgs e)
         {
-            ThemSuaDanhMuc win = new ThemSuaDanhMuc();
+            // Truyền 0 hoặc không truyền gì nghĩa là THÊM MỚI
+            ThemSuaDanhMuc win = new ThemSuaDanhMuc(0);
             win.ShowDialog();
             LoadData(); // Load lại bảng sau khi thêm xong
         }
 
         private void btnSua_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Chức năng sửa đang hoàn thiện.");
+            // 1. Kiểm tra xem người dùng đã chọn dòng nào trên DataGrid chưa
+            if (dataGridDanhMuc.SelectedItem == null)
+            {
+                MessageBox.Show("Vui lòng chọn danh mục cần sửa!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // 2. Lấy dữ liệu của dòng đang chọn
+            var item = dataGridDanhMuc.SelectedItem as DanhMucModel;
+
+            // 3. Mở cửa sổ ThemSuaDanhMuc và TRUYỀN ID CỦA DANH MỤC SANG ĐỂ SỬA
+            ThemSuaDanhMuc win = new ThemSuaDanhMuc(item.MaDanhMuc);
+            win.ShowDialog();
+
+            // 4. Load lại dữ liệu sau khi cửa sổ sửa đóng lại
+            LoadData();
         }
 
         private void btnXoa_Click(object sender, RoutedEventArgs e)
@@ -73,14 +89,24 @@ namespace WpfApp
             }
 
             var item = dataGridDanhMuc.SelectedItem as DanhMucModel;
-            var result = MessageBox.Show($"Bạn có chắc muốn xóa danh mục \"{item.TenDanhMuc}\"?\nLưu ý: Các giao dịch liên quan cũng sẽ bị xóa!",
-                                         "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show($"Bạn có chắc muốn xóa danh mục \"{item.TenDanhMuc}\"?\nLưu ý: Các giao dịch liên quan cũng sẽ tự động bị xóa!",
+                                         "Xác nhận xóa", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
-                string query = $"DELETE FROM DanhMuc WHERE MaDanhMuc = {item.MaDanhMuc}";
-                DatabaseHelper.ExecuteQuery(query);
-                LoadData();
+                try
+                {
+                    // Thực thi lệnh xóa dưới Database
+                    string query = $"DELETE FROM DanhMuc WHERE MaDanhMuc = {item.MaDanhMuc}";
+                    DatabaseHelper.ExecuteQuery(query);
+
+                    MessageBox.Show("Đã xóa danh mục thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LoadData(); // Tải lại bảng
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi khi xóa dữ liệu: " + ex.Message, "Lỗi Database", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

@@ -5,8 +5,99 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="CaiDatChung" Height="450" Width="800">
-    <Grid>
-        
+        Title="Cài đặt chung"
+        Height="400" Width="550"
+        MinHeight="350" MinWidth="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="#F5F7FA">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- TIÊU ĐỀ (cố định) -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Cài đặt chung"
+                       FontSize="22" FontWeight="Bold" Foreground="#1F2937"/>
+            <TextBlock Text="Cấu hình đơn vị tiền tệ mặc định cho ứng dụng"
+                       FontSize="13" Foreground="#6B7280" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- SCROLLVIEWER -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="0,0,8,0">
+            <Border Background="White" CornerRadius="10" Padding="24">
+                <StackPanel>
+
+                    <!-- Icon + Tiêu đề -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <Border Width="44" Height="44" CornerRadius="22"
+                                Background="#DCFCE7" Margin="0,0,14,0">
+                            <TextBlock Text="💵" FontSize="20"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Đơn vị tiền tệ mặc định"
+                                       FontSize="15" FontWeight="SemiBold"
+                                       Foreground="#1F2937"/>
+                            <TextBlock Text="Áp dụng cho toàn bộ giao dịch, ngân sách, báo cáo"
+                                       FontSize="12" Foreground="#6B7280" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- ComboBox chọn tiền tệ -->
+                    <TextBlock Text="Chọn đơn vị tiền tệ:"
+                               FontSize="13" FontWeight="SemiBold"
+                               Foreground="#374151" Margin="0,0,0,8"/>
+
+                    <ComboBox x:Name="cboTienTe"
+                              Height="42" FontSize="14"
+                              VerticalContentAlignment="Center"
+                              Padding="10,0">
+                        <ComboBoxItem Content="VND — Việt Nam Đồng (₫)"/>
+                        <ComboBoxItem Content="USD — US Dollar ($)"/>
+                        <ComboBoxItem Content="EUR — Euro (€)"/>
+                    </ComboBox>
+
+                    <TextBlock Text="💡 Đơn vị này sẽ được áp dụng cho tất cả các số tiền hiển thị trong ứng dụng."
+                               FontSize="11" Foreground="#9CA3AF"
+                               TextWrapping="Wrap" Margin="0,12,0,0"/>
+
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+
+        <!-- NÚT (cố định) -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="btnHuy"
+                    Grid.Column="0"
+                    Content="Hủy bỏ"
+                    Height="44"
+                    Background="#94A3B8" Foreground="White"
+                    FontWeight="Bold" FontSize="14"
+                    BorderThickness="0" Cursor="Hand"
+                    Click="btnHuy_Click"/>
+
+            <Button x:Name="btnLuu"
+                    Grid.Column="2"
+                    Content="💾 Lưu cài đặt"
+                    Height="44"
+                    Background="#2563EB" Foreground="White"
+                    FontWeight="Bold" FontSize="14"
+                    BorderThickness="0" Cursor="Hand"
+                    Click="btnLuu_Click"/>
+        </Grid>
     </Grid>
 </Window>

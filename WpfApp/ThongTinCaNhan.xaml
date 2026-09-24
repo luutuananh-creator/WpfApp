@@ -5,8 +5,115 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="ThongTinCaNhan" Height="450" Width="800">
-    <Grid>
-        
+        Title="Thông tin cá nhân"
+        Height="560" Width="550"
+        MinHeight="400" MinWidth="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="#F5F7FA">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Tiêu đề -->
+            <RowDefinition Height="*"/>
+            <!-- ScrollViewer -->
+            <RowDefinition Height="Auto"/>
+            <!-- Nút -->
+        </Grid.RowDefinitions>
+
+        <!-- TIÊU ĐỀ (cố định) -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Thông tin cá nhân"
+                       FontSize="22" FontWeight="Bold" Foreground="#1F2937"/>
+            <TextBlock Text="Cập nhật họ tên, email và thông tin tài khoản"
+                       FontSize="13" Foreground="#6B7280" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- SCROLLVIEWER — Cho phép cuộn khi form dài -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="0,0,8,0">
+            <Border Background="White" CornerRadius="10" Padding="24">
+                <StackPanel>
+
+                    <!-- Icon + Tên đăng nhập (readonly) -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <Border Width="56" Height="56" CornerRadius="28"
+                                Background="#DBEAFE" Margin="0,0,16,0">
+                            <TextBlock Text="👤" FontSize="26"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="txtTenDangNhapHienThi"
+                                       Text="username"
+                                       FontSize="16" FontWeight="Bold"
+                                       Foreground="#1F2937"/>
+                            <TextBlock Text="Tên đăng nhập không thể thay đổi"
+                                       FontSize="11" Foreground="#9CA3AF" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Họ tên -->
+                    <TextBlock Text="Họ và tên:"
+                               FontSize="13" FontWeight="SemiBold"
+                               Foreground="#374151" Margin="0,0,0,6"/>
+                    <TextBox x:Name="txtHoTen"
+                             Height="42" Padding="10,0"
+                             FontSize="14"
+                             VerticalContentAlignment="Center"
+                             Margin="0,0,0,16"/>
+
+                    <!-- Email -->
+                    <TextBlock Text="Email:"
+                               FontSize="13" FontWeight="SemiBold"
+                               Foreground="#374151" Margin="0,0,0,6"/>
+                    <TextBox x:Name="txtEmail"
+                             Height="42" Padding="10,0"
+                             FontSize="14"
+                             VerticalContentAlignment="Center"
+                             Margin="0,0,0,16"/>
+
+                    <!-- Ngày tạo (readonly) -->
+                    <TextBlock Text="Ngày tạo tài khoản:"
+                               FontSize="13" FontWeight="SemiBold"
+                               Foreground="#374151" Margin="0,0,0,6"/>
+                    <Border Background="#F3F4F6" CornerRadius="6" Padding="12,10">
+                        <TextBlock x:Name="txtNgayTao"
+                                   Text="—"
+                                   FontSize="13" Foreground="#6B7280"/>
+                    </Border>
+
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+
+        <!-- NÚT (cố định) -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="btnHuy"
+                    Grid.Column="0"
+                    Content="Hủy bỏ"
+                    Height="44"
+                    Background="#94A3B8" Foreground="White"
+                    FontWeight="Bold" FontSize="14"
+                    BorderThickness="0" Cursor="Hand"
+                    Click="btnHuy_Click"/>
+
+            <Button x:Name="btnLuu"
+                    Grid.Column="2"
+                    Content="💾 Lưu thay đổi"
+                    Height="44"
+                    Background="#2563EB" Foreground="White"
+                    FontWeight="Bold" FontSize="14"
+                    BorderThickness="0" Cursor="Hand"
+                    Click="btnLuu_Click"/>
+        </Grid>
     </Grid>
 </Window>

@@ -29,7 +29,7 @@
 
             <TextBox x:Name="txtNoiDung" Height="80" Padding="10" TextWrapping="Wrap" AcceptsReturn="True" 
                      VerticalScrollBarVisibility="Auto" FontSize="15" BorderBrush="#CBD5E1" 
-                     Text="Sáng nay uống cafe 25k, trưa ăn cơm tấm 40k..." TextChanged="txtNoiDung_TextChanged"/>
+                     Text="" TextChanged="txtNoiDung_TextChanged"/>
 
             <!-- Nút Phân tích AI -->
             <Button x:Name="btnPhanTich" Content="🪄 Phân tích dữ liệu" Height="45" Margin="0,15,0,0"
