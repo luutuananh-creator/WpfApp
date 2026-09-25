@@ -64,7 +64,7 @@ namespace WpfApp
         }
         #endregion
 
-        #region 2. TẢI DỮ LIỆU VÀ LỌC
+        // 2. TẢI DỮ LIỆU VÀ LỌC
         private void LoadDanhMucIntoComboBox()
         {
             try
@@ -96,7 +96,6 @@ namespace WpfApp
                 MessageBox.Show("Lỗi tải danh mục: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
         private void TaiDanhSachNganSach()
         {
             if (!isLoaded) return;
@@ -123,20 +122,20 @@ namespace WpfApp
 
                     // Chuỗi SQL truy vấn động
                     string query = @"
-                        SELECT 
-                            ns.MaNganSach,
-                            ns.MaDanhMuc,
-                            dm.TenDanhMuc,
-                            ns.HanMuc,
-                            ISNULL(SUM(gd.SoTien), 0) AS DaChi
-                        FROM NganSach ns
-                        INNER JOIN DanhMuc dm ON ns.MaDanhMuc = dm.MaDanhMuc
-                        LEFT JOIN GiaoDich gd ON gd.MaDanhMuc = ns.MaDanhMuc 
-                                             AND MONTH(gd.NgayGiaoDich) = ns.Thang 
-                                             AND YEAR(gd.NgayGiaoDich) = ns.Nam
-                        WHERE ns.Thang = @Thang 
-                          AND ns.Nam = @Nam 
-                          AND ns.MaNguoiDung = @MaNguoiDung";
+                SELECT 
+                    ns.MaNganSach,
+                    ns.MaDanhMuc,
+                    dm.TenDanhMuc,
+                    ns.HanMuc,
+                    ISNULL(SUM(gd.SoTien), 0) AS DaChi
+                FROM NganSach ns
+                INNER JOIN DanhMuc dm ON ns.MaDanhMuc = dm.MaDanhMuc
+                LEFT JOIN GiaoDich gd ON gd.MaDanhMuc = ns.MaDanhMuc 
+                                      AND MONTH(gd.NgayGiaoDich) = ns.Thang 
+                                      AND YEAR(gd.NgayGiaoDich) = ns.Nam
+                WHERE ns.Thang = @Thang 
+                  AND ns.Nam = @Nam 
+                  AND ns.MaNguoiDung = @MaNguoiDung";
 
                     // Thêm điều kiện nếu chọn danh mục cụ thể
                     if (maDanhMucLoc > 0)
@@ -170,13 +169,47 @@ namespace WpfApp
                 }
 
                 dgvNganSach.ItemsSource = list;
+
+                
+                
+                if (isLoaded)
+                {
+                    List<string> vuotHanMuc = new List<string>();
+                    List<string> sapHet = new List<string>();
+
+                    foreach (var item in list)
+                    {
+                        if (item.PhanTramDung >= 100)
+                        {
+                            vuotHanMuc.Add($"❌ {item.TenDanhMuc}: Âm {item.DaChi - item.HanMuc:N0} đ");
+                        }
+                        else if (item.PhanTramDung >= 80)
+                        {
+                            sapHet.Add($"⚠️ {item.TenDanhMuc}: Đã dùng {item.PhanTramHienThi} (Còn {item.ConLai:N0} đ)");
+                        }
+                    }
+
+                    if (vuotHanMuc.Count > 0 || sapHet.Count > 0)
+                    {
+                        string thongBao = "TÌNH TRẠNG NGÂN SÁCH THÁNG NÀY:\n\n";
+
+                        if (vuotHanMuc.Count > 0)
+                            thongBao += "🚨 ĐÃ VƯỢT NGÂN SÁCH:\n" + string.Join("\n", vuotHanMuc) + "\n\n";
+
+                        if (sapHet.Count > 0)
+                            thongBao += "⏳ SẮP HẾT NGÂN SÁCH:\n" + string.Join("\n", sapHet);
+
+                        MessageBox.Show(thongBao, "Cảnh Báo Chi Tiêu", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi kết nối CSDL: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        #endregion
+
+
 
         #region 3. SỰ KIỆN THAY ĐỔI BỘ LỌC
         private void cboFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -190,7 +223,7 @@ namespace WpfApp
         }
         #endregion
 
-        #region 4. SỰ KIỆN NÚT BẤM (THÊM, SỬA, XÓA)
+        // 4. SỰ KIỆN NÚT BẤM (THÊM, SỬA, XÓA)
         private void btnThemNganSach_Click(object sender, RoutedEventArgs e)
         {
             ThemSuaNganSach popup = new ThemSuaNganSach(0);
@@ -227,14 +260,9 @@ namespace WpfApp
                 {
                     try
                     {
-                        using (SqlConnection conn = new SqlConnection(connectionString))
-                        {
-                            conn.Open();
-                            string query = "DELETE FROM NganSach WHERE MaNganSach = @MaNganSach";
-                            SqlCommand cmd = new SqlCommand(query, conn);
-                            cmd.Parameters.AddWithValue("@MaNganSach", itemChon.MaNganSach);
-                            cmd.ExecuteNonQuery();
-                        }
+                        // Dùng DatabaseHelper thay vì SqlConnection
+                        string query = $"DELETE FROM NganSach WHERE MaNganSach = {itemChon.MaNganSach}";
+                        DatabaseHelper.ExecuteQuery(query);
 
                         MessageBox.Show("Đã xóa thành công!", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
                         TaiDanhSachNganSach();
@@ -250,7 +278,6 @@ namespace WpfApp
                 MessageBox.Show("Vui lòng chọn một dòng ngân sách để xóa!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        #endregion
     }
 
 }

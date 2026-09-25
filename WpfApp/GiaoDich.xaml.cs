@@ -201,6 +201,11 @@ namespace WpfApp
             var item = dgvGiaoDich.SelectedItem as GiaoDichModel;
 
             MessageBox.Show($"Bạn đang chọn sửa giao dịch Mã số: {item.MaGiaoDich}.\n\n(Để hoàn thiện, ta cần chỉnh sửa lại Constructor của trang ThemSuaGiaoDich để nó nhận dữ liệu truyền sang!)", "Thông báo");
+            ThemSuaGiaoDich win = new ThemSuaGiaoDich(item.MaGiaoDich);
+            win.ShowDialog();
+
+            // Load lại lưới sau khi sửa xong
+            LoadData();
         }
 
       

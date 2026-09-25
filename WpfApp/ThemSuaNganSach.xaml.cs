@@ -2,27 +2,27 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Data;
+
 
 namespace WpfApp
 {
     public partial class ThemSuaNganSach : Window
     {
-        private string connectionString = @"Server=(LocalDB)\MSSQLLocalDB;Database=QuanLyTaiChinhAI;Trusted_Connection=True;";
-        private int _maNganSach = 0; // 0: Thêm mới | >0: Chỉnh sửa
-        private int _currentUserId = 1;
+        private int _maNganSach = 0;
 
-        // Constructor dùng cho CẢ THÊM VÀ SỬA
         public ThemSuaNganSach(int maNganSach = 0)
         {
             InitializeComponent();
             _maNganSach = maNganSach;
             this.Loaded += ThemSuaNganSach_Loaded;
         }
+
         private void txtHanMuc_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
-            // Chỉ cho phép nhập số
             e.Handled = !System.Text.RegularExpressions.Regex.IsMatch(e.Text, @"^[0-9]+$");
         }
+
         private void ThemSuaNganSach_Loaded(object sender, RoutedEventArgs e)
         {
             LoadDanhMuc();
@@ -30,10 +30,9 @@ namespace WpfApp
 
             if (_maNganSach > 0)
             {
-                // Chế độ SỬA
                 txtTieuDe.Text = "CHỈNH SỬA NGÂN SÁCH";
                 txtTieuDe.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.DarkOrange);
-                LoadDataChiTiet();
+                LoadDataChiTiet(); // Gọi dữ liệu cũ lên
             }
         }
 
@@ -48,31 +47,15 @@ namespace WpfApp
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    // Lấy các danh mục của người dùng hiện tại (hoặc lọc theo LoaiDanhMuc = N'Chi tiêu' nếu cần)
-                    string query = "SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc WHERE MaNguoiDung = @MaNguoiDung";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@MaNguoiDung", _currentUserId);
+                
+                string query = $"SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc WHERE MaNguoiDung = {DangNhap.MaNguoiDungHienTai}";
+                DataTable dt = DatabaseHelper.GetData(query);
 
-                    SqlDataReader reader = cmd.ExecuteReader();
+                cboDanhMuc.ItemsSource = dt.DefaultView;
+                cboDanhMuc.DisplayMemberPath = "TenDanhMuc";
+                cboDanhMuc.SelectedValuePath = "MaDanhMuc";
 
-                    // Nếu bạn dùng Binding qua DisplayMemberPath và SelectedValuePath trong XAML:
-                    var listDanhMuc = new List<DanhMucModel>();
-                    while (reader.Read())
-                    {
-                        listDanhMuc.Add(new DanhMucModel
-                        {
-                            MaDanhMuc = Convert.ToInt32(reader["MaDanhMuc"]),
-                            TenDanhMuc = reader["TenDanhMuc"].ToString()
-                        });
-                    }
-
-                    cboDanhMuc.ItemsSource = listDanhMuc;
-                    cboDanhMuc.DisplayMemberPath = "TenDanhMuc";
-                    cboDanhMuc.SelectedValuePath = "MaDanhMuc";
-                }
+                if (_maNganSach == 0 && dt.Rows.Count > 0) cboDanhMuc.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
@@ -82,7 +65,23 @@ namespace WpfApp
 
         private void LoadDataChiTiet()
         {
-            // Query lấy thông tin ngân sách theo _maNganSach và đổ lên cboDanhMuc, txtHanMuc...
+            try
+            {
+                string query = $"SELECT * FROM NganSach WHERE MaNganSach = {_maNganSach}";
+                DataTable dt = DatabaseHelper.GetData(query);
+
+                if (dt.Rows.Count > 0)
+                {
+                    cboDanhMuc.SelectedValue = dt.Rows[0]["MaDanhMuc"];
+                    cboThang.SelectedIndex = Convert.ToInt32(dt.Rows[0]["Thang"]) - 1;
+                    txtNam.Text = dt.Rows[0]["Nam"].ToString();
+                    txtHanMuc.Text = Convert.ToDecimal(dt.Rows[0]["HanMuc"]).ToString("0"); // Đổ hạn mức cũ ra
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi lấy chi tiết ngân sách: " + ex.Message);
+            }
         }
 
         private void btnLuu_Click(object sender, RoutedEventArgs e)
@@ -93,46 +92,38 @@ namespace WpfApp
                 return;
             }
 
+            if (cboDanhMuc.SelectedValue == null)
+            {
+                MessageBox.Show("Vui lòng chọn danh mục!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             int maDanhMuc = Convert.ToInt32(cboDanhMuc.SelectedValue);
             int thang = cboThang.SelectedIndex + 1;
             int nam = Convert.ToInt32(txtNam.Text);
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                string query = "";
+                if (_maNganSach == 0) // LỆNH INSERT
                 {
-                    conn.Open();
-                    string query = "";
-
-                    if (_maNganSach == 0) // LỆNH INSERT
-                    {
-                        query = @"INSERT INTO NganSach (MaNguoiDung, MaDanhMuc, Thang, Nam, HanMuc) 
-                                  VALUES (@MaNguoiDung, @MaDanhMuc, @Thang, @Nam, @HanMuc)";
-                    }
-                    else // LỆNH UPDATE
-                    {
-                        query = @"UPDATE NganSach 
-                                  SET MaDanhMuc = @MaDanhMuc, Thang = @Thang, Nam = @Nam, HanMuc = @HanMuc 
-                                  WHERE MaNganSach = @MaNganSach";
-                    }
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@MaNguoiDung", _currentUserId);
-                    cmd.Parameters.AddWithValue("@MaDanhMuc", maDanhMuc);
-                    cmd.Parameters.AddWithValue("@Thang", thang);
-                    cmd.Parameters.AddWithValue("@Nam", nam);
-                    cmd.Parameters.AddWithValue("@HanMuc", hanMuc);
-                    if (_maNganSach > 0) cmd.Parameters.AddWithValue("@MaNganSach", _maNganSach);
-
-                    cmd.ExecuteNonQuery();
+                    query = $@"INSERT INTO NganSach (MaNguoiDung, MaDanhMuc, Thang, Nam, HanMuc) 
+                               VALUES ({DangNhap.MaNguoiDungHienTai}, {maDanhMuc}, {thang}, {nam}, {hanMuc})";
+                }
+                else // LỆNH UPDATE
+                {
+                    query = $@"UPDATE NganSach 
+                               SET MaDanhMuc = {maDanhMuc}, Thang = {thang}, Nam = {nam}, HanMuc = {hanMuc} 
+                               WHERE MaNganSach = {_maNganSach}";
                 }
 
+                DatabaseHelper.ExecuteQuery(query);
                 MessageBox.Show("Lưu thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                this.DialogResult = true; // Đóng cửa sổ và báo thành công
+                this.DialogResult = true; // Trả về true để màn hình chính biết và tải lại lưới DataGrid
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi lưu dữ liệu: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Lỗi lưu dữ liệu: " + ex.Message, "Lỗi Database", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -6,8 +6,9 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace WpfApp
-{
+
+namespace WpfApp 
+{ 
     public partial class TongQuan : Page
     {
         private DateTime tuNgay;
@@ -25,7 +26,9 @@ namespace WpfApp
             TaiThongTinTongQuan();
         }
 
-        // 1. Tính toán mốc TuNgay - DenNgay dựa trên ComboBox
+       
+        // 1. TÍNH TOÁN KHOẢNG THỜI GIAN THEO COMBOBOX
+        
         private void CapNhatKhoangThoiGian()
         {
             if (cboThoiGian == null || cboThoiGian.SelectedItem == null) return;
@@ -61,9 +64,7 @@ namespace WpfApp
 
         private void cboThoiGian_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Tránh lỗi NullReferenceException khi XAML đang dựng giao diện
-            if (!this.IsLoaded) return;
-
+            if (!this.IsLoaded) return; // Tránh lỗi khi giao diện chưa kịp vẽ xong
             CapNhatKhoangThoiGian();
             TaiThongTinTongQuan();
         }
@@ -75,13 +76,13 @@ namespace WpfApp
             VeBieuDoChiTieu();
         }
 
-        // 2. Thống kê Tổng thu, Tổng chi, Số dư theo khoảng thời gian
+        
+        // 2. THỐNG KÊ TỔNG THU - TỔNG CHI - SỐ DƯ
+       
         private void LoadThongKeThuChi()
         {
             try
             {
-                int maNguoiDung = DangNhap.MaNguoiDungHienTai > 0 ? DangNhap.MaNguoiDungHienTai : 1;
-
                 string query = @"
                     SELECT 
                         ISNULL(SUM(CASE WHEN dm.LoaiDanhMuc = N'Thu nhập' THEN gd.SoTien ELSE 0 END), 0) AS TongThu,
@@ -94,7 +95,7 @@ namespace WpfApp
 
                 SqlParameter[] p = new SqlParameter[]
                 {
-                    new SqlParameter("@MaNguoiDung", maNguoiDung),
+                    new SqlParameter("@MaNguoiDung", DangNhap.MaNguoiDungHienTai), 
                     new SqlParameter("@TuNgay", tuNgay),
                     new SqlParameter("@DenNgay", denNgay)
                 };
@@ -117,13 +118,13 @@ namespace WpfApp
             }
         }
 
-        // 3. Tiến độ Ngân sách
+        
+        // 3. THANH TIẾN ĐỘ NGÂN SÁCH
+        
         private void LoadTinhTrangNganSach()
         {
             try
             {
-                int maNguoiDung = DangNhap.MaNguoiDungHienTai > 0 ? DangNhap.MaNguoiDungHienTai : 1;
-
                 string query = @"
                     SELECT 
                         ISNULL(SUM(ns.HanMuc), 0) AS TongHanMuc,
@@ -139,7 +140,7 @@ namespace WpfApp
 
                 SqlParameter[] p = new SqlParameter[]
                 {
-                    new SqlParameter("@MaNguoiDung", maNguoiDung),
+                    new SqlParameter("@MaNguoiDung", DangNhap.MaNguoiDungHienTai),
                     new SqlParameter("@Thang", tuNgay.Month),
                     new SqlParameter("@Nam", tuNgay.Year)
                 };
@@ -159,11 +160,13 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải ngân sách: " + ex.Message, "Lỗi Database");
+                MessageBox.Show("Lỗi tải ngân sách tổng quan: " + ex.Message, "Lỗi Database");
             }
         }
 
-        // 4. Vẽ Biểu đồ Cột Chi tiêu
+        
+        // 4. VẼ BIỂU ĐỒ CỘT TOP 5 CHI TIÊU
+        
         private void VeBieuDoChiTieu()
         {
             if (canvasBieuDo == null) return;
@@ -171,8 +174,6 @@ namespace WpfApp
 
             try
             {
-                int maNguoiDung = DangNhap.MaNguoiDungHienTai > 0 ? DangNhap.MaNguoiDungHienTai : 1;
-
                 string query = @"
                     SELECT TOP 5 dm.TenDanhMuc, SUM(gd.SoTien) AS TongTien
                     FROM GiaoDich gd
@@ -186,7 +187,7 @@ namespace WpfApp
 
                 SqlParameter[] p = new SqlParameter[]
                 {
-                    new SqlParameter("@MaNguoiDung", maNguoiDung),
+                    new SqlParameter("@MaNguoiDung", DangNhap.MaNguoiDungHienTai),
                     new SqlParameter("@TuNgay", tuNgay),
                     new SqlParameter("@DenNgay", denNgay)
                 };
@@ -291,7 +292,9 @@ namespace WpfApp
             if (this.IsLoaded) VeBieuDoChiTieu();
         }
 
-        // 5. Chuyển hướng các trang
+        
+        // 5. ĐIỀU HƯỚNG TRANG (NAVIGATION)
+        
         private void btnXemGiaoDich_Click(object sender, RoutedEventArgs e)
         {
             this.NavigationService?.Navigate(new Uri("GiaoDich.xaml", UriKind.Relative));
