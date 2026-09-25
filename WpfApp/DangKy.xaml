@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
-        Title="Đăng Ký Tài Khoản" Height="580" Width="800"
+        Title="Đăng Ký Tài Khoản" WindowState="Maximized"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Grid Background="#F5F6FA">

@@ -8,7 +8,7 @@
         Title="Phần mềm Quản lý Tài chính Cá nhân - My Finance" 
         Height="680" Width="1050"
         WindowStartupLocation="CenterScreen"
-        MinHeight="600" MinWidth="900">
+        WindowState="Maximized">
 
     <Grid>
         <!-- ĐỊNH NGHĨA GIAO DIỆN CHUNG CHO CÁC NÚT (STYLE) -->
@@ -73,8 +73,9 @@
 
                 <!-- Danh sách Nút Menu chính -->
                 <Button x:Name="btnMenuTongQuan" Content="📊  Tổng quan" Style="{StaticResource MenuButtonStyle}" Click="btnMenuTongQuan_Click"/>
-                <Button x:Name="btnMenuGiaoDich" Content="💸  Giao dịch" Style="{StaticResource MenuButtonStyle}" Click="btnMenuGiaoDich_Click"/>
                 <Button x:Name="btnMenuDanhMuc" Content="📂  Danh mục" Style="{StaticResource MenuButtonStyle}" Click="btnMenuDanhMuc_Click"/>
+                <Button x:Name="btnMenuGiaoDich" Content="💸  Giao dịch" Style="{StaticResource MenuButtonStyle}" Click="btnMenuGiaoDich_Click"/>
+
                 <Button x:Name="btnMenuNganSach" Content="🎯  Ngân sách" Style="{StaticResource MenuButtonStyle}" Click="btnMenuNganSach_Click"/>
                 <Button x:Name="btnMenuMucTieu" Content="⭐  Mục tiêu tiết kiệm" Style="{StaticResource MenuButtonStyle}" Click="btnMenuMucTieu_Click"/>
                 <Button x:Name="btnMenuPhanTich" Content="📈  Phân tích" Style="{StaticResource MenuButtonStyle}" Click="btnMenuPhanTich_Click"/>
@@ -90,8 +91,7 @@
 
         <!-- VÙNG HIỂN THỊ PAGE BÊN PHẢI -->
         <Frame x:Name="MainFrame" 
-       Grid.Column="1" 
        NavigationUIVisibility="Hidden" 
-       Margin="10"/>
+       Margin="150,-104,100,124" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>
