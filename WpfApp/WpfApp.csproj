@@ -249,6 +249,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Tesseract, Version=5.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tesseract.5.2.0\lib\net47\Tesseract.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -292,6 +295,7 @@
     <Compile Include="QuetHoaDonAI.xaml.cs">
       <DependentUpon>QuetHoaDonAI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="QuetHoaDonAIService.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="ThemSuaDanhMuc.xaml.cs">
       <DependentUpon>ThemSuaDanhMuc.xaml</DependentUpon>
@@ -445,6 +449,8 @@
     <Error Condition="!Exists('..\packages\Microsoft.Data.SqlClient.SNI.7.1.0\build\net462\Microsoft.Data.SqlClient.SNI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Data.SqlClient.SNI.7.1.0\build\net462\Microsoft.Data.SqlClient.SNI.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Identity.Client.NativeInterop.0.20.6\build\net462\Microsoft.Identity.Client.NativeInterop.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Identity.Client.NativeInterop.0.20.6\build\net462\Microsoft.Identity.Client.NativeInterop.props'))" />
     <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))" />
+    <Error Condition="!Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Tesseract.5.2.0\build\Tesseract.targets'))" />
   </Target>
   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+  <Import Project="..\packages\Tesseract.5.2.0\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" />
 </Project>

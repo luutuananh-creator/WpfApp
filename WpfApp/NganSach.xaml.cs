@@ -20,10 +20,48 @@ namespace WpfApp
 
         private void NganSach_Loaded(object sender, RoutedEventArgs e)
         {
-            InitThangNam();
+            // ⭐ Tự động chọn tháng của giao dịch mới nhất
+            int thangMacDinh = DateTime.Now.Month;
+            int namMacDinh = DateTime.Now.Year;
+
+            try
+            {
+                string sql = @"
+            SELECT TOP 1 MONTH(NgayGiaoDich) AS Thang, YEAR(NgayGiaoDich) AS Nam
+            FROM GiaoDich
+            WHERE MaNguoiDung = @MaNguoiDung
+            ORDER BY NgayTao DESC";
+
+                var dt = DatabaseHelper.GetData(sql, new SqlParameter[] {
+            new SqlParameter("@MaNguoiDung", DangNhap.MaNguoiDungHienTai)
+        });
+
+                if (dt.Rows.Count > 0)
+                {
+                    thangMacDinh = Convert.ToInt32(dt.Rows[0]["Thang"]);
+                    namMacDinh = Convert.ToInt32(dt.Rows[0]["Nam"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Lỗi lấy tháng giao dịch mới: " + ex.Message);
+            }
+
+            InitThangNam(thangMacDinh, namMacDinh);
             LoadDanhMucIntoComboBox();
-            isLoaded = true; // Đã load xong UI
+            isLoaded = true;
             TaiDanhSachNganSach();
+        }
+
+        private void InitThangNam(int thang, int nam)
+        {
+            cboLocThang.Items.Clear();
+            for (int i = 1; i <= 12; i++)
+            {
+                cboLocThang.Items.Add($"Tháng {i}");
+            }
+            cboLocThang.SelectedIndex = thang - 1;
+            txtLocNam.Text = nam.ToString();
         }
 
         private void InitThangNam()
