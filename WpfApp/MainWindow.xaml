@@ -91,7 +91,8 @@
 
         <!-- VÙNG HIỂN THỊ PAGE BÊN PHẢI -->
         <Frame x:Name="MainFrame" 
+       Grid.Column="1" 
        NavigationUIVisibility="Hidden" 
-       Margin="150,-104,100,124" Grid.ColumnSpan="2"/>
+       Margin="0" Background="#F8F9FA"/>
     </Grid>
 </Window>
