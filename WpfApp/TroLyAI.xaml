@@ -1,108 +1,110 @@
 ﻿<Page x:Class="WpfApp.TroLyAI"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:WpfApp"
-      mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="800"
-      Title="TroLyAI">
-
+      Title="Trợ lý AI" Background="#F8FAFC">
+    <Page.Resources>
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10,4"/>
+        </Style>
+    </Page.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Dòng 0: Tiêu đề -->
             <RowDefinition Height="*"/>
-            <!-- Dòng 1: Nội dung chính -->
         </Grid.RowDefinitions>
-
-        <!-- TIÊU ĐỀ -->
-        <TextBlock Grid.Row="0" Text="TRỢ LÝ AI TÀI CHÍNH" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
-
-        <!-- KHU VỰC CHÍNH CHIA 2 CỘT -->
+        <TextBlock Text="TRỢ LÝ AI TÀI CHÍNH" FontSize="24" FontWeight="Bold"
+                   Foreground="#0F172A" Margin="0,0,0,20"/>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
-                <!-- Cột trái: Công cụ AI -->
+                <ColumnDefinition Width="210"/>
                 <ColumnDefinition Width="20"/>
-                <!-- Khoảng cách 2 cột -->
                 <ColumnDefinition Width="*"/>
-                <!-- Cột phải: Chatbot -->
             </Grid.ColumnDefinitions>
-
-            <!-- CỘT TRÁI: CÁC CÔNG CỤ THAO TÁC NHANH -->
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="⚡ CÔNG CỤ NHANH" FontWeight="Bold" Foreground="Gray" Margin="0,0,0,15"/>
-
-                <!-- Nút Quét hóa đơn -->
-                <Button x:Name="btnQuetHoaDon" Content="📷 Quét hóa đơn" Height="50" Margin="0,0,0,15" 
-                        Background="#8B5CF6" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"
-                        Click="btnQuetHoaDon_Click"/>
-
-                <!-- Nút Nhập giao dịch bằng AI -->
-                <Button x:Name="btnNhapGiaoDich" Content="📝 Nhập bằng AI" Height="50" Margin="0,0,0,15" 
-                        Background="#6366F1" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"
-                        Click="btnNhapGiaoDich_Click"/>
-
-                <!-- Nút Phân tích tài chính -->
-                <Button x:Name="btnPhanTich" Content="📈 Phân tích thông minh" Height="50" 
-                        Background="#3B82F6" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"
-                        Click="btnPhanTich_Click"/>
-            </StackPanel>
-
-            <!-- CỘT PHẢI: GIAO DIỆN CHATBOT -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="CÔNG CỤ NHANH" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,14"/>
+                    <Button x:Name="btnQuetHoaDon" Content="Quét hóa đơn" Style="{StaticResource ActionButton}"
+                            Background="#8B5CF6" Click="btnQuetHoaDon_Click"/>
+                    <Button x:Name="btnNhapGiaoDich" Content="Nhập bằng AI" Style="{StaticResource ActionButton}"
+                            Background="#6366F1" Click="btnNhapGiaoDich_Click"/>
+                    <Separator Margin="0,4,0,16"/>
+                    <TextBlock Text="PHÂN TÍCH THEO THÁNG" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,10"/>
+                    <TextBlock Text="Chọn một ngày trong tháng:" FontSize="12" Margin="0,0,0,6"/>
+                    <DatePicker x:Name="dpThangPhanTich" Margin="0,0,0,12"/>
+                    <Button x:Name="btnPhanTich" Content="Phân tích thông minh" Style="{StaticResource ActionButton}"
+                            Click="btnPhanTich_Click"/>
+                    <TextBlock Text="Mỗi lần bấm sẽ đọc số liệu mới và lưu báo cáo sau khi AI phân tích thành công."
+                               TextWrapping="Wrap" Foreground="#64748B" FontSize="12" Margin="0,0,0,18"/>
+                    <TextBlock Text="BẠN CÓ THỂ HỎI" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,10"/>
+                    <Button x:Name="btnGoiYThuChi" Content="Tháng này tôi chi bao nhiêu?" Padding="6,10" Margin="0,0,0,8"
+                            Click="btnGoiY_Click" HorizontalContentAlignment="Left"/>
+                    <Button x:Name="btnGoiYNganSach" Content="Ngân sách nào sắp hết?" Padding="6,10" Margin="0,0,0,8"
+                            Click="btnGoiY_Click" HorizontalContentAlignment="Left"/>
+                    <Button x:Name="btnGoiYMucTieu" Content="Tiến độ tiết kiệm của tôi?" Padding="6,10" Margin="0,0,0,8"
+                            Click="btnGoiY_Click" HorizontalContentAlignment="Left"/>
+                </StackPanel>
+            </ScrollViewer>
             <Border Grid.Column="2" Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!-- Header chat -->
                         <RowDefinition Height="*"/>
-                        <!-- Khu vực tin nhắn -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Khung nhập chat -->
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
-                    <!-- Khung tiêu đề Chat -->
-                    <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="15">
-                        <TextBlock Text="🤖 Trò chuyện với Gemini AI" FontWeight="Bold" Foreground="#334155" FontSize="16"/>
-                    </Border>
-
-                    <!-- Khung hiển thị lịch sử tin nhắn -->
-                    <ScrollViewer Grid.Row="1" Margin="15" VerticalScrollBarVisibility="Auto">
+                    <Border Padding="16" Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
                         <StackPanel>
-                            <!-- Tin nhắn mẫu của AI (Căn trái, nền xám nhạt) -->
-                            <Border Background="#F1F5F9" Padding="15" CornerRadius="8,8,8,0" HorizontalAlignment="Left" MaxWidth="350" Margin="0,0,0,15">
-                                <TextBlock Text="Chào bạn! Mình là Trợ lý AI. Bạn cần mình giúp gì hôm nay? (Ví dụ: Thêm giao dịch ăn sáng 35k, hoặc Phân tích chi tiêu tuần này)" TextWrapping="Wrap" LineHeight="20"/>
-                            </Border>
-
-                            <!-- Tin nhắn mẫu của Người dùng (Căn phải, nền xanh lá/xanh dương) -->
-                            <Border Background="#10B981" Padding="15" CornerRadius="8,8,0,8" HorizontalAlignment="Right" MaxWidth="350" Margin="0,0,0,15">
-                                <TextBlock Text="Hôm nay mình ăn sáng hết 35k và đổ xăng 50k." Foreground="White" TextWrapping="Wrap"/>
-                            </Border>
-
-                            <!-- Tin nhắn mẫu AI phản hồi -->
-                            <Border Background="#F1F5F9" Padding="15" CornerRadius="8,8,8,0" HorizontalAlignment="Left" MaxWidth="350" Margin="0,0,0,15">
-                                <TextBlock Text="Đã nhận diện 2 giao dịch:&#x0a;1. Ăn uống: 35,000 đ&#x0a;2. Đi lại (Đổ xăng): 50,000 đ&#x0a;Bạn có muốn lưu vào hệ thống không?" TextWrapping="Wrap" LineHeight="20"/>
-                            </Border>
+                            <TextBlock Text="Trò chuyện với trợ lý AI · Groq" FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Text="Câu hỏi, hội thoại gần đây và số liệu tổng hợp cần thiết được gửi tới Groq để trả lời."
+                                       TextWrapping="Wrap" Foreground="#64748B" FontSize="12" Margin="0,6,0,0"/>
                         </StackPanel>
+                    </Border>
+                    <ScrollViewer x:Name="chatScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="chatMessages" Margin="16"/>
                     </ScrollViewer>
-
-                    <!-- Khung nhập liệu ở dưới cùng -->
-                    <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="10">
+                    <TextBlock x:Name="txtTrangThai" Grid.Row="2" TextWrapping="Wrap" Margin="16,6"
+                               Foreground="#475569" FontSize="12" AutomationProperties.LiveSetting="Polite"/>
+                    <Border Grid.Row="3" Padding="12" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0">
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-
-                            <!-- Ô nhập text -->
-                            <TextBox x:Name="txtChatInput" Grid.Column="0" Height="45" VerticalContentAlignment="Center" Padding="15,0"
-                                     BorderThickness="1" BorderBrush="#CBD5E1" Text="Nhập yêu cầu của bạn vào đây..."/>
-
-                            <!-- Nút Gửi -->
-                            <Button x:Name="btnGuiTinNhan" Grid.Column="1" Content="Gửi 🚀" Width="80" Height="45" Margin="10,0,0,0" 
-                                    Background="#3B82F6" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"
-                                    Click="btnGuiTinNhan_Click"/>
+                            <Grid>
+                                <TextBox x:Name="txtChatInput" MinHeight="64" MaxHeight="120" MaxLength="2000" Padding="10"
+                                         TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                                         BorderBrush="#CBD5E1" PreviewKeyDown="txtChatInput_PreviewKeyDown"/>
+                                <TextBlock Text="Nhập câu hỏi của bạn..." Margin="12" Foreground="#94A3B8" IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text.Length, ElementName=txtChatInput}" Value="0">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0" Width="80">
+                                <Button x:Name="btnGuiTinNhan" Content="Gửi" Height="34" Background="#2563EB" Foreground="White"
+                                        Click="btnGuiTinNhan_Click"/>
+                                <Button x:Name="btnDung" Content="Dừng" Height="26" Margin="0,4,0,0" IsEnabled="False" Click="btnDung_Click"/>
+                            </StackPanel>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="Enter để gửi · Shift+Enter xuống dòng · Nhận xét AI có thể có sai sót."
+                                       TextWrapping="Wrap" FontSize="11" Foreground="#64748B" Margin="0,7,0,0"/>
                         </Grid>
                     </Border>
                 </Grid>

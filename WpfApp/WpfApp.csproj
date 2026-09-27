@@ -318,6 +318,10 @@
     <Compile Include="TroLyAI.xaml.cs">
       <DependentUpon>TroLyAI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TroLyAiGroqClient.cs" />
+    <Compile Include="TroLyAiModels.cs" />
+    <Compile Include="TroLyAiRepository.cs" />
+    <Compile Include="TroLyAiService.cs" />
     <Page Include="CaiDat.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
