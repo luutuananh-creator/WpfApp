@@ -73,31 +73,7 @@
                 </Grid>
             </Border>
 
-            <!-- Card: Cài đặt chung -->
-            <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,12">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Width="48" Height="48" CornerRadius="24"
-                            Background="#DCFCE7" Margin="0,0,16,0">
-                        <TextBlock Text="🛠️" FontSize="22"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Cài đặt chung" FontSize="15" FontWeight="SemiBold" Foreground="#1F2937"/>
-                        <TextBlock Text="Đơn vị tiền tệ mặc định và hạn mức cảnh báo"
-                                   FontSize="12" Foreground="#6B7280" Margin="0,2,0,0"/>
-                    </StackPanel>
-                    <Button Grid.Column="2" x:Name="btnCaiDatChung" Content="Mở  ›"
-                            Click="btnCaiDatChung_Click"
-                            Background="#2563EB" Foreground="White"
-                            BorderThickness="0" Padding="16,8" Cursor="Hand"/>
-                </Grid>
-            </Border>
-
+            
             <!-- Card: Đăng xuất -->
             <Border Background="#FEF2F2" CornerRadius="12" Padding="20" Margin="0,12,0,0">
                 <Grid>
