@@ -2,6 +2,8 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows;
 using WpfApp.Helpers;
 
@@ -26,10 +28,15 @@ namespace WpfApp
         // ============ LOAD: Kiểm tra ghi nhớ ============
         private void DangNhap_Loaded(object sender, RoutedEventArgs e)
         {
-            string rememberUser = DocTaiKhoanGhiNho();
+            var (rememberUser, rememberPass) = DocTaiKhoanGhiNho();
 
-            if (!string.IsNullOrEmpty(rememberUser))
+            if (!string.IsNullOrEmpty(rememberUser) && !string.IsNullOrEmpty(rememberPass))
             {
+                // Điền sẵn thông tin vào form
+                txtTenDangNhap.Text = rememberUser;
+                txtMatKhau.Password = rememberPass;
+                chkGhiNho.IsChecked = true;
+
                 // Có ghi nhớ → hiện màn hình xin chào
                 spDangNhapDayDu.Visibility = Visibility.Collapsed;
                 spXinChao.Visibility = Visibility.Visible;
@@ -57,28 +64,21 @@ namespace WpfApp
         // ============ ĐĂNG NHẬP NHANH ============
         private void btnDangNhapNhanh_Click(object sender, RoutedEventArgs e)
         {
-            string taiKhoan = DocTaiKhoanGhiNho();
+            var (taiKhoan, matKhau) = DocTaiKhoanGhiNho();
 
-            if (string.IsNullOrEmpty(taiKhoan))
+            if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(matKhau))
             {
-                MessageBox.Show("Không tìm thấy tài khoản ghi nhớ!",
+                MessageBox.Show("Không tìm thấy thông tin đăng nhập ghi nhớ!",
                                 "Lỗi", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                // Trở về màn hình đăng nhập thường
+                spDangNhapDayDu.Visibility = Visibility.Visible;
+                spXinChao.Visibility = Visibility.Collapsed;
                 return;
             }
 
-            // Chuyển về form đăng nhập, điền sẵn tên
-            spDangNhapDayDu.Visibility = Visibility.Visible;
-            spXinChao.Visibility = Visibility.Collapsed;
-
-            txtTenDangNhap.Text = taiKhoan;
-            txtTenDangNhap.IsReadOnly = true;
-            chkGhiNho.IsChecked = true;
-
-            txtMatKhau.Focus();
-
-            MessageBox.Show($"Vui lòng nhập mật khẩu cho tài khoản '{taiKhoan}'!",
-                            "Đăng nhập nhanh",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
+            // Đăng nhập tự động ngay lập tức bằng dữ liệu đã ghi nhớ
+            DangNhapThuc(taiKhoan, matKhau, true);
         }
 
         // ============ QUAY LẠI (XÓA GHI NHỚ) ============
@@ -159,9 +159,9 @@ namespace WpfApp
                 Session.TenDangNhap = dt.Rows[0]["TenDangNhap"].ToString();
                 Session.Email = dt.Rows[0]["Email"].ToString();
 
-                // Lưu/xóa ghi nhớ theo checkbox
+                // Lưu/xóa ghi nhớ theo checkbox (Lưu cả tên + mật khẩu đã mã hóa)
                 if (ghiNho)
-                    LuuTaiKhoanGhiNho(dt.Rows[0]["TenDangNhap"].ToString());
+                    LuuTaiKhoanGhiNho(dt.Rows[0]["TenDangNhap"].ToString(), matKhau);
                 else
                     XoaTaiKhoanGhiNho();
 
@@ -181,8 +181,8 @@ namespace WpfApp
             }
         }
 
-        // ============ LƯU/ĐỌC/XÓA GHI NHỚ ============
-        private void LuuTaiKhoanGhiNho(string tenDangNhap)
+        // ============ LƯU/ĐỌC/XÓA GHI NHỚ MÃ HÓA (DPAPI) ============
+        private void LuuTaiKhoanGhiNho(string tenDangNhap, string matKhau)
         {
             try
             {
@@ -190,7 +190,10 @@ namespace WpfApp
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
 
-                File.WriteAllText(RememberFile, tenDangNhap);
+                string rawData = $"{tenDangNhap}|{matKhau}";
+                string encryptedData = EncryptDPAPI(rawData);
+
+                File.WriteAllText(RememberFile, encryptedData);
             }
             catch (Exception ex)
             {
@@ -198,18 +201,27 @@ namespace WpfApp
             }
         }
 
-        private string DocTaiKhoanGhiNho()
+        private (string username, string password) DocTaiKhoanGhiNho()
         {
             try
             {
                 if (File.Exists(RememberFile))
-                    return File.ReadAllText(RememberFile).Trim();
+                {
+                    string encryptedData = File.ReadAllText(RememberFile).Trim();
+                    string decryptedData = DecryptDPAPI(encryptedData);
+
+                    if (!string.IsNullOrEmpty(decryptedData) && decryptedData.Contains("|"))
+                    {
+                        string[] parts = decryptedData.Split('|');
+                        return (parts[0], parts[1]);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Lỗi đọc ghi nhớ: {ex.Message}");
             }
-            return "";
+            return ("", "");
         }
 
         private void XoaTaiKhoanGhiNho()
@@ -225,6 +237,30 @@ namespace WpfApp
             }
         }
 
+        // Helper mã hóa DPAPI an toàn (dựa theo tài khoản Windows)
+        private string EncryptDPAPI(string plainText)
+        {
+            if (string.IsNullOrEmpty(plainText)) return "";
+            byte[] data = Encoding.UTF8.GetBytes(plainText);
+            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
+            return Convert.ToBase64String(encrypted);
+        }
+
+        private string DecryptDPAPI(string encryptedText)
+        {
+            if (string.IsNullOrEmpty(encryptedText)) return "";
+            try
+            {
+                byte[] data = Convert.FromBase64String(encryptedText);
+                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
+                return Encoding.UTF8.GetString(decrypted);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         // ============ CÁC NÚT KHÁC ============
         private void btnDangKy_Click(object sender, RoutedEventArgs e)
         {
@@ -233,7 +269,6 @@ namespace WpfApp
             this.Close();
         }
 
-        // ✅ SỬA: Mở trang DoiMatKhau (đã làm chức năng Quên mật khẩu)
         private void btnQuenMatKhau_Click(object sender, RoutedEventArgs e)
         {
             DoiMatKhau quenMatKhau = new DoiMatKhau();
