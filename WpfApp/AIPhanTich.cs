@@ -3,54 +3,50 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace WpfApp 
+namespace WpfApp
 {
-    public class GroqHelper
+    public class AIPhanTich
     {
-        
-        private static readonly string ApiKey = ""; 
-
+        // Nhớ dán API Key của Groq vào đây (bắt đầu bằng gsk_...)
+        private static readonly string ApiKey = "";
         private static readonly string ApiUrl = "https://api.groq.com/openai/v1/chat/completions";
+        private const string MODEL = "openai/gpt-oss-120b";
 
-        public static async Task<string> GuiYeuCauPhanTich(string prompt)
+        public static async Task<string> GuiYeuCau(string prompt)
         {
             using (HttpClient client = new HttpClient())
             {
-                // Groq yêu cầu xác thực qua Header (Bearer Token)
+                // Groq bắt buộc truyền API Key qua Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
 
-                // Đóng gói dữ liệu theo chuẩn OpenAI/Groq
                 var requestBody = new
                 {
-                    model = "openai/gpt-oss-120b", 
+                    model = MODEL,
                     messages = new[]
                     {
                         new { role = "user", content = prompt }
                     },
-                    temperature = 0.1 // Để thấp giúp AI tập trung trả về JSON chuẩn xác, ít bịa chữ
+                    temperature = 0.2 // Giảm sự "sáng tạo", ép AI nói thật dựa trên dữ liệu
                 };
 
-                string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(requestBody);
+                string jsonBody = JsonConvert.SerializeObject(requestBody);
                 var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-                // Bắn API
                 HttpResponseMessage response = await client.PostAsync(ApiUrl, content);
                 string responseString = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Giải mã kết quả của Groq
                     JObject json = JObject.Parse(responseString);
                     string resultText = json["choices"]?[0]?["message"]?["content"]?.ToString();
-
-                    // Loại bỏ các ký hiệu markdown code block nếu AI cố tình chèn vào
-                    return resultText.Replace("```json", "").Replace("```", "").Trim();
+                    return resultText?.Replace("```json", "").Replace("```", "").Trim();
                 }
                 else
                 {
-                    throw new Exception("Lỗi gọi API Groq: " + responseString);
+                    throw new Exception("Lỗi liên kết Groq API: " + responseString);
                 }
             }
         }

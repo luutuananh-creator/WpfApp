@@ -274,6 +274,7 @@
     <Compile Include="DoiMatKhau.xaml.cs">
       <DependentUpon>DoiMatKhau.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AIPhanTich.cs" />
     <Compile Include="GiaoDich.xaml.cs">
       <DependentUpon>GiaoDich.xaml</DependentUpon>
     </Compile>
@@ -318,10 +319,6 @@
     <Compile Include="TroLyAI.xaml.cs">
       <DependentUpon>TroLyAI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TroLyAiGroqClient.cs" />
-    <Compile Include="TroLyAiModels.cs" />
-    <Compile Include="TroLyAiRepository.cs" />
-    <Compile Include="TroLyAiService.cs" />
     <Page Include="CaiDat.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
