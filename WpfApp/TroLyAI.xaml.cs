@@ -8,7 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using WpfApp.AI;
-
+using System.Text.RegularExpressions;
+using System.Windows.Documents;
 namespace WpfApp
 {
     public partial class TroLyAI : Page
@@ -199,35 +200,195 @@ namespace WpfApp
             return "Có lỗi khi xử lý yêu cầu. Hãy thử lại hoặc kiểm tra cấu hình dự án.";
         }
 
+        // Hiển thị một tin nhắn lên khung chat.
         private void AddMessage(string text, bool fromUser)
         {
-            var content = new TextBox
+            var noiDung = new StackPanel();
+
+            // Nhãn nhỏ giúp phân biệt người dùng và trợ lý.
+            noiDung.Children.Add(new TextBlock
             {
-                Text = text,
-                IsReadOnly = true,
-                IsReadOnlyCaretVisible = false,
-                TextWrapping = TextWrapping.Wrap,
-                BorderThickness = new Thickness(0),
-                Background = Brushes.Transparent,
-                FontSize = 14,
-                Foreground = fromUser ? Brushes.White : new SolidColorBrush(Color.FromRgb(30, 41, 59)),
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
-            };
-            var bubble = new Border
+                Text = fromUser ? "BẠN" : "TRỢ LÝ AI",
+                FontSize = 10,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = fromUser
+                    ? Brushes.White
+                    : new SolidColorBrush(Color.FromRgb(100, 116, 139)),
+                Opacity = 0.8,
+                Margin = new Thickness(0, 0, 0, 8)
+            });
+
+            if (fromUser)
             {
-                Child = content,
-                Padding = new Thickness(12),
-                Margin = new Thickness(0, 0, 0, 12),
-                CornerRadius = new CornerRadius(10),
+                // Tin nhắn người dùng hiển thị nguyên văn.
+                noiDung.Children.Add(new TextBlock
+                {
+                    Text = text,
+                    FontSize = 14,
+                    Foreground = Brushes.White,
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 23
+                });
+            }
+            else
+            {
+                // Tin nhắn AI được xử lý in đậm và xuống dòng.
+                noiDung.Children.Add(TaoNoiDungAI(text));
+            }
+
+            var khung = new Border
+            {
+                Child = noiDung,
+
+                Padding = new Thickness(18, 14, 18, 14),
+                Margin = new Thickness(0, 0, 0, 18),
                 MaxWidth = 720,
-                HorizontalAlignment = fromUser ? HorizontalAlignment.Right : HorizontalAlignment.Left,
-                Background = new SolidColorBrush(fromUser ? Color.FromRgb(37, 99, 235) : Color.FromRgb(241, 245, 249))
+
+                HorizontalAlignment = fromUser
+                    ? HorizontalAlignment.Right
+                    : HorizontalAlignment.Left,
+
+                CornerRadius = fromUser
+                    ? new CornerRadius(14, 14, 4, 14)
+                    : new CornerRadius(14, 14, 14, 4),
+
+                Background = fromUser
+                    ? new SolidColorBrush(Color.FromRgb(37, 99, 235))
+                    : new SolidColorBrush(Color.FromRgb(248, 250, 252)),
+
+                BorderBrush = fromUser
+                    ? Brushes.Transparent
+                    : new SolidColorBrush(Color.FromRgb(226, 232, 240)),
+
+                BorderThickness = new Thickness(1)
             };
-            chatMessages.Children.Add(bubble);
-            // Bound the visual tree in long sessions; persisted history remains in the database.
-            while (chatMessages.Children.Count > 80) chatMessages.Children.RemoveAt(0);
+
+            chatMessages.Children.Add(khung);
+
+            // Giới hạn số tin nhắn đang hiển thị để giao diện nhẹ hơn.
+            // Không xóa lịch sử trong database.
+            while (chatMessages.Children.Count > 80)
+            {
+                chatMessages.Children.RemoveAt(0);
+            }
+
+            chatScroll.UpdateLayout();
             chatScroll.ScrollToEnd();
+        }
+
+
+        // Chia câu trả lời AI thành từng dòng có khoảng cách.
+        private StackPanel TaoNoiDungAI(string text)
+        {
+            var panel = new StackPanel();
+
+            string[] cacDong = (text ?? "")
+                .Replace("\r\n", "\n")
+                .Replace("\r", "\n")
+                .Split('\n');
+
+            bool cachDoan = false;
+
+            foreach (string dongGoc in cacDong)
+            {
+                string dong = dongGoc.Trim();
+
+                if (string.IsNullOrWhiteSpace(dong))
+                {
+                    cachDoan = true;
+                    continue;
+                }
+
+                // Nhận diện tiêu đề Markdown: #, ## hoặc ###.
+                bool laTieuDe = Regex.IsMatch(dong, @"^#{1,3}\s+");
+
+                if (laTieuDe)
+                {
+                    dong = Regex.Replace(dong, @"^#{1,3}\s+", "");
+                }
+
+                // Dòng chỉ chứa một đoạn **in đậm** cũng được xem là tiêu đề.
+                bool caDongInDam = Regex.IsMatch(
+                    dong,
+                    @"^\*\*[^*]+\*\*$"
+                );
+
+                // Đổi "- nội dung" hoặc "* nội dung" thành dấu đầu dòng.
+                dong = Regex.Replace(dong, @"^[-*]\s+", "• ");
+
+                var textBlock = new TextBlock
+                {
+                    FontFamily = new FontFamily("Segoe UI"),
+
+                    FontSize = laTieuDe || caDongInDam ? 15 : 14,
+
+                    FontWeight = laTieuDe
+                        ? FontWeights.SemiBold
+                        : FontWeights.Normal,
+
+                    Foreground = new SolidColorBrush(
+                        Color.FromRgb(30, 41, 59)
+                    ),
+
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 24,
+
+                    Margin = new Thickness(
+                        0,
+                        cachDoan && panel.Children.Count > 0 ? 8 : 0,
+                        0,
+                        5
+                    )
+                };
+
+                ThemChuInDam(textBlock, dong);
+
+                panel.Children.Add(textBlock);
+                cachDoan = false;
+            }
+
+            return panel;
+        }
+
+
+        // Chuyển **nội dung** thành chữ in đậm thực sự.
+        private void ThemChuInDam(TextBlock textBlock, string noiDung)
+        {
+            MatchCollection cacDoanInDam = Regex.Matches(
+                noiDung,
+                @"\*\*(.+?)\*\*"
+            );
+
+            int viTriHienTai = 0;
+
+            foreach (Match match in cacDoanInDam)
+            {
+                // Thêm phần chữ thường trước đoạn in đậm.
+                if (match.Index > viTriHienTai)
+                {
+                    string chuThuong = noiDung.Substring(
+                        viTriHienTai,
+                        match.Index - viTriHienTai
+                    );
+
+                    textBlock.Inlines.Add(new Run(chuThuong));
+                }
+
+                // Thêm phần in đậm, bỏ hai cặp dấu **.
+                textBlock.Inlines.Add(
+                    new Bold(new Run(match.Groups[1].Value))
+                );
+
+                viTriHienTai = match.Index + match.Length;
+            }
+
+            // Thêm phần chữ thường còn lại.
+            if (viTriHienTai < noiDung.Length)
+            {
+                textBlock.Inlines.Add(
+                    new Run(noiDung.Substring(viTriHienTai))
+                );
+            }
         }
 
         private async void btnGuiTinNhan_Click(object sender, RoutedEventArgs e)
