@@ -73,8 +73,9 @@
 
                 <!-- Danh sách Nút Menu chính -->
                 <Button x:Name="btnMenuTongQuan" Content="📊  Tổng quan" Style="{StaticResource MenuButtonStyle}" Click="btnMenuTongQuan_Click"/>
-                <Button x:Name="btnMenuNganSach" Content="🎯  Ngân sách" Style="{StaticResource MenuButtonStyle}" Click="btnMenuNganSach_Click"/>
                 <Button x:Name="btnMenuDanhMuc" Content="📂  Danh mục" Style="{StaticResource MenuButtonStyle}" Click="btnMenuDanhMuc_Click"/>
+                <Button x:Name="btnMenuNganSach" Content="🎯  Ngân sách" Style="{StaticResource MenuButtonStyle}" Click="btnMenuNganSach_Click"/>
+                
                 <Button x:Name="btnMenuGiaoDich" Content="💸  Giao dịch" Style="{StaticResource MenuButtonStyle}" Click="btnMenuGiaoDich_Click"/>
 
                 

@@ -10,16 +10,17 @@ namespace WpfApp
 {
     public class AIPhanTich
     {
-        // Nhớ dán API Key của Groq vào đây (bắt đầu bằng gsk_...)
+        
         private static readonly string ApiKey = "";
         private static readonly string ApiUrl = "https://api.groq.com/openai/v1/chat/completions";
+
+        
         private const string MODEL = "openai/gpt-oss-120b";
 
         public static async Task<string> GuiYeuCau(string prompt)
         {
             using (HttpClient client = new HttpClient())
             {
-                // Groq bắt buộc truyền API Key qua Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
 
                 var requestBody = new
@@ -29,7 +30,7 @@ namespace WpfApp
                     {
                         new { role = "user", content = prompt }
                     },
-                    temperature = 0.2 // Giảm sự "sáng tạo", ép AI nói thật dựa trên dữ liệu
+                    temperature = 0.2
                 };
 
                 string jsonBody = JsonConvert.SerializeObject(requestBody);

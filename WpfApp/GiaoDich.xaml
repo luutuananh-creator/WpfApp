@@ -83,6 +83,9 @@
                     <ComboBoxItem Content="Thu nhập"/>
                     <ComboBoxItem Content="Chi tiêu"/>
                 </ComboBox>
+                <ComboBox x:Name="cboLocChiTietDanhMuc" Width="130" Height="36" Margin="10,0,0,0" VerticalContentAlignment="Center" 
+                          SelectionChanged="cboLocChiTietDanhMuc_SelectionChanged" Visibility="Collapsed">
+                </ComboBox>
             </StackPanel>
 
             <!-- Cụm nút AI (Phải) -->

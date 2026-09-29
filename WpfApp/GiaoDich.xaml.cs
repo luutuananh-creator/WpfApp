@@ -14,12 +14,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data;
 
-
-namespace WpfApp 
+namespace WpfApp
 {
     public partial class GiaoDich : Page
     {
-        // Biến toàn cục lưu danh sách gốc lấy từ DB để phục vụ việc lọc mà không cần gọi DB liên tục
+        
         List<GiaoDichModel> danhSachGoc = new List<GiaoDichModel>();
 
         public GiaoDich()
@@ -28,7 +27,6 @@ namespace WpfApp
             LoadData();
         }
 
-       
         private void LoadData()
         {
             try
@@ -65,7 +63,6 @@ namespace WpfApp
                 MessageBox.Show("Lỗi tải giao dịch: " + ex.Message);
             }
         }
-
 
         private void LocDuLieu()
         {
@@ -104,6 +101,18 @@ namespace WpfApp
                 if (loai == "Thu nhập" || loai == "Chi tiêu")
                 {
                     ketQua = ketQua.Where(x => x.Loai == loai);
+
+                    // D. MỚI: Lọc thêm theo chi tiết danh mục (Ví dụ: Ăn uống, Lương...)
+                    if (cboLocChiTietDanhMuc != null &&
+                        cboLocChiTietDanhMuc.Visibility == Visibility.Visible &&
+                        cboLocChiTietDanhMuc.SelectedItem != null)
+                    {
+                        string chiTiet = ((ComboBoxItem)cboLocChiTietDanhMuc.SelectedItem).Content.ToString();
+                        if (chiTiet != "Tất cả chi tiết")
+                        {
+                            ketQua = ketQua.Where(x => x.DanhMuc == chiTiet);
+                        }
+                    }
                 }
             }
 
@@ -116,7 +125,65 @@ namespace WpfApp
 
         // ============ SỰ KIỆN LỌC ============
         private void txtTimKiem_TextChanged(object sender, TextChangedEventArgs e) { LocDuLieu(); }
-        private void cboLocDanhMuc_SelectionChanged(object sender, SelectionChangedEventArgs e) { LocDuLieu(); }
+
+        // SỰ KIỆN LỌC 2 CẤP THU/CHI
+        private void cboLocDanhMuc_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded || cboLocDanhMuc.SelectedItem == null) return;
+
+            string loai = ((ComboBoxItem)cboLocDanhMuc.SelectedItem).Content.ToString();
+
+            if (loai == "Tất cả")
+            {
+                if (cboLocChiTietDanhMuc != null)
+                {
+                    cboLocChiTietDanhMuc.Visibility = Visibility.Collapsed;
+                    cboLocChiTietDanhMuc.Items.Clear();
+                }
+            }
+            else
+            {
+                if (cboLocChiTietDanhMuc != null)
+                {
+                    cboLocChiTietDanhMuc.Visibility = Visibility.Visible;
+                    LoadChiTietDanhMuc(loai);
+                }
+            }
+
+            LocDuLieu();
+        }
+
+        private void LoadChiTietDanhMuc(string loaiDanhMuc)
+        {
+            try
+            {
+                string query = $"SELECT TenDanhMuc FROM DanhMuc WHERE MaNguoiDung = {DangNhap.MaNguoiDungHienTai} AND LoaiDanhMuc = N'{loaiDanhMuc}'";
+                DataTable dt = DatabaseHelper.GetData(query);
+
+                cboLocChiTietDanhMuc.Items.Clear();
+
+                ComboBoxItem itemTatCa = new ComboBoxItem { Content = "Tất cả chi tiết", IsSelected = true };
+                cboLocChiTietDanhMuc.Items.Add(itemTatCa);
+
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        cboLocChiTietDanhMuc.Items.Add(new ComboBoxItem { Content = row["TenDanhMuc"].ToString() });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Lỗi tải chi tiết danh mục: " + ex.Message);
+            }
+        }
+
+        private void cboLocChiTietDanhMuc_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded) return;
+            LocDuLieu();
+        }
 
         // Khi người dùng chọn lại ngày trên DatePicker
         private void dpTuNgay_SelectedDateChanged(object sender, SelectionChangedEventArgs e) { LocDuLieu(); }
@@ -155,10 +222,6 @@ namespace WpfApp
             }
         }
 
-        // Các event kích hoạt hàm lọc
-       
-
-        
         private void btnXoaGiaoDich_Click(object sender, RoutedEventArgs e)
         {
             if (dgvGiaoDich.SelectedItem == null)
@@ -179,7 +242,7 @@ namespace WpfApp
                     int row = DatabaseHelper.ExecuteQuery(query);
                     if (row > 0)
                     {
-                        LoadData(); 
+                        LoadData();
                     }
                 }
                 catch (Exception ex)
@@ -189,7 +252,6 @@ namespace WpfApp
             }
         }
 
-        
         private void btnSuaGiaoDich_Click(object sender, RoutedEventArgs e)
         {
             if (dgvGiaoDich.SelectedItem == null)
@@ -208,7 +270,6 @@ namespace WpfApp
             LoadData();
         }
 
-      
         private void btnThemGiaoDich_Click(object sender, RoutedEventArgs e)
         {
             ThemSuaGiaoDich win = new ThemSuaGiaoDich();
@@ -231,11 +292,10 @@ namespace WpfApp
         }
     }
 
-    
     public class GiaoDichModel
     {
-        public int MaGiaoDich { get; set; } 
-        public DateTime NgayGiaoDich { get; set; } 
+        public int MaGiaoDich { get; set; }
+        public DateTime NgayGiaoDich { get; set; }
         public string Ngay { get; set; }
         public string Loai { get; set; }
         public string DanhMuc { get; set; }
