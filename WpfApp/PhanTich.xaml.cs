@@ -34,7 +34,7 @@ namespace WpfApp
         private DateTime tuNgay;
         private DateTime denNgay;
         private string _loaiXem = "Tổng hợp";
-        private string _kieuSoSanh = "📊 So sánh 2 tháng tự chọn";
+        private string _kieuSoSanh = "📊 So sánh 2 tháng";
 
         private int _thang1 = DateTime.Now.Month;
         private int _nam1 = DateTime.Now.Year;
@@ -220,7 +220,7 @@ namespace WpfApp
         }
 
         // ============================================================
-        // BIỂU ĐỒ TRÒN — Có hover + tooltip
+        // BIỂU ĐỒ TRÒN — Hỗ trợ "Tổng hợp" + Fix 1 danh mục
         // ============================================================
         private void LoadBieuDoTron()
         {
@@ -229,8 +229,9 @@ namespace WpfApp
 
             try
             {
-                string loaiDanhMuc;
+                string loaiDanhMuc = null;
                 string tieuDe;
+                bool laTongHop = false;
 
                 switch (_loaiXem)
                 {
@@ -239,32 +240,63 @@ namespace WpfApp
                         tieuDe = "CƠ CẤU THU NHẬP";
                         break;
                     case "Chỉ xem Chi tiêu":
-                    default:
                         loaiDanhMuc = "Chi tiêu";
                         tieuDe = "CƠ CẤU CHI TIÊU";
+                        break;
+                    case "Tổng hợp":
+                    default:
+                        loaiDanhMuc = null;
+                        tieuDe = "CƠ CẤU THU CHI (TỔNG HỢP)";
+                        laTongHop = true;
                         break;
                 }
 
                 if (txtTieuDeBieuDoTron != null)
                     txtTieuDeBieuDoTron.Text = tieuDe;
 
-                string query = @"
-                    SELECT dm.TenDanhMuc, SUM(gd.SoTien) AS TongTien
-                    FROM GiaoDich gd
-                    INNER JOIN DanhMuc dm ON gd.MaDanhMuc = dm.MaDanhMuc
-                    WHERE gd.MaNguoiDung = @MaNguoiDung
-                      AND dm.LoaiDanhMuc = @LoaiDanhMuc
-                      AND gd.NgayGiaoDich >= @TuNgay
-                      AND gd.NgayGiaoDich <= @DenNgay
-                    GROUP BY dm.TenDanhMuc
-                    ORDER BY TongTien DESC";
+                string query;
+                SqlParameter[] p;
 
-                SqlParameter[] p = {
-                    new SqlParameter("@MaNguoiDung", DangNhap.MaNguoiDungHienTai),
-                    new SqlParameter("@LoaiDanhMuc", loaiDanhMuc),
-                    new SqlParameter("@TuNgay", tuNgay),
-                    new SqlParameter("@DenNgay", denNgay)
-                };
+                if (laTongHop)
+                {
+                    query = @"
+                        SELECT dm.TenDanhMuc + N' (' + dm.LoaiDanhMuc + N')' AS TenHienThi,
+                               SUM(gd.SoTien) AS TongTien
+                        FROM GiaoDich gd
+                        INNER JOIN DanhMuc dm ON gd.MaDanhMuc = dm.MaDanhMuc
+                        WHERE gd.MaNguoiDung = @MaNguoiDung
+                          AND gd.NgayGiaoDich >= @TuNgay
+                          AND gd.NgayGiaoDich <= @DenNgay
+                        GROUP BY dm.TenDanhMuc, dm.LoaiDanhMuc
+                        ORDER BY TongTien DESC";
+
+                    p = new SqlParameter[] {
+                        new SqlParameter("@MaNguoiDung", DangNhap.MaNguoiDungHienTai),
+                        new SqlParameter("@TuNgay", tuNgay),
+                        new SqlParameter("@DenNgay", denNgay)
+                    };
+                }
+                else
+                {
+                    query = @"
+                        SELECT dm.TenDanhMuc AS TenHienThi,
+                               SUM(gd.SoTien) AS TongTien
+                        FROM GiaoDich gd
+                        INNER JOIN DanhMuc dm ON gd.MaDanhMuc = dm.MaDanhMuc
+                        WHERE gd.MaNguoiDung = @MaNguoiDung
+                          AND dm.LoaiDanhMuc = @LoaiDanhMuc
+                          AND gd.NgayGiaoDich >= @TuNgay
+                          AND gd.NgayGiaoDich <= @DenNgay
+                        GROUP BY dm.TenDanhMuc
+                        ORDER BY TongTien DESC";
+
+                    p = new SqlParameter[] {
+                        new SqlParameter("@MaNguoiDung", DangNhap.MaNguoiDungHienTai),
+                        new SqlParameter("@LoaiDanhMuc", loaiDanhMuc),
+                        new SqlParameter("@TuNgay", tuNgay),
+                        new SqlParameter("@DenNgay", denNgay)
+                    };
+                }
 
                 DataTable dt = DatabaseHelper.GetData(query, p);
 
@@ -308,48 +340,88 @@ namespace WpfApp
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
-                    string tenDM = dt.Rows[i]["TenDanhMuc"].ToString();
+                    string tenDM = dt.Rows[i]["TenHienThi"].ToString();
                     decimal soTien = Convert.ToDecimal(dt.Rows[i]["TongTien"]);
                     double tyLe = tongTien > 0 ? (double)(soTien / tongTien) * 100 : 0;
                     double sweepAngle = tyLe / 100 * 360;
 
-                    Path slice = CreatePieSlice(centerX, centerY, radius, startAngle, sweepAngle, colors[i % colors.Length]);
-
-                    ToolTip tip = new ToolTip
+                    // ⭐ XỬ LÝ ĐẶC BIỆT: 1 danh mục hoặc sweepAngle >= 360°
+                    if (dt.Rows.Count == 1 || sweepAngle >= 359.9)
                     {
-                        Content = $"{tenDM}\n{soTien:N0} đ\n({tyLe:F1}%)",
-                        Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1F2937")),
-                        Foreground = Brushes.White,
-                        FontSize = 13,
-                        FontWeight = FontWeights.SemiBold,
-                        Padding = new Thickness(12, 8, 12, 8),
-                        BorderThickness = new Thickness(0),
-                        HasDropShadow = true
-                    };
+                        // Vẽ hình tròn đầy
+                        Ellipse circle = new Ellipse
+                        {
+                            Width = radius * 2,
+                            Height = radius * 2,
+                            Fill = colors[i % colors.Length],
+                            Stroke = Brushes.White,
+                            StrokeThickness = 1
+                        };
+                        Canvas.SetLeft(circle, centerX - radius);
+                        Canvas.SetTop(circle, centerY - radius);
 
-                    slice.ToolTip = tip;
-                    slice.Cursor = System.Windows.Input.Cursors.Hand;
+                        circle.ToolTip = new ToolTip
+                        {
+                            Content = $"{tenDM}\n{soTien:N0} đ\n({tyLe:F1}%)",
+                            Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1F2937")),
+                            Foreground = Brushes.White,
+                            FontSize = 13,
+                            FontWeight = FontWeights.SemiBold,
+                            Padding = new Thickness(12, 8, 12, 8),
+                            BorderThickness = new Thickness(0),
+                            HasDropShadow = true
+                        };
+                        circle.Cursor = System.Windows.Input.Cursors.Hand;
 
-                    Brush originalColor = colors[i % colors.Length];
-                    Brush hoverColor = LightenBrush(originalColor, 0.3);
+                        Brush origColor = colors[i % colors.Length];
+                        Brush hovColor = LightenBrush(origColor, 0.3);
+                        circle.MouseEnter += (s, e) => { circle.Opacity = 0.85; circle.Fill = hovColor; };
+                        circle.MouseLeave += (s, e) => { circle.Opacity = 1; circle.Fill = origColor; };
 
-                    slice.MouseEnter += (s, e) =>
+                        canvasBieuDoTron.Children.Add(circle);
+                    }
+                    else
                     {
-                        slice.Opacity = 0.85;
-                        slice.StrokeThickness = 3;
-                        slice.Stroke = Brushes.White;
-                        slice.Fill = hoverColor;
-                    };
+                        // Vẽ pie slice bình thường
+                        Path slice = CreatePieSlice(centerX, centerY, radius, startAngle, sweepAngle, colors[i % colors.Length]);
 
-                    slice.MouseLeave += (s, e) =>
-                    {
-                        slice.Opacity = 1;
-                        slice.StrokeThickness = 1;
-                        slice.Stroke = Brushes.White;
-                        slice.Fill = originalColor;
-                    };
+                        ToolTip tip = new ToolTip
+                        {
+                            Content = $"{tenDM}\n{soTien:N0} đ\n({tyLe:F1}%)",
+                            Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1F2937")),
+                            Foreground = Brushes.White,
+                            FontSize = 13,
+                            FontWeight = FontWeights.SemiBold,
+                            Padding = new Thickness(12, 8, 12, 8),
+                            BorderThickness = new Thickness(0),
+                            HasDropShadow = true
+                        };
 
-                    canvasBieuDoTron.Children.Add(slice);
+                        slice.ToolTip = tip;
+                        slice.Cursor = System.Windows.Input.Cursors.Hand;
+
+                        Brush originalColor = colors[i % colors.Length];
+                        Brush hoverColor = LightenBrush(originalColor, 0.3);
+
+                        slice.MouseEnter += (s, e) =>
+                        {
+                            slice.Opacity = 0.85;
+                            slice.StrokeThickness = 3;
+                            slice.Stroke = Brushes.White;
+                            slice.Fill = hoverColor;
+                        };
+
+                        slice.MouseLeave += (s, e) =>
+                        {
+                            slice.Opacity = 1;
+                            slice.StrokeThickness = 1;
+                            slice.Stroke = Brushes.White;
+                            slice.Fill = originalColor;
+                        };
+
+                        canvasBieuDoTron.Children.Add(slice);
+                    }
+
                     startAngle += sweepAngle;
                 }
 
@@ -359,7 +431,7 @@ namespace WpfApp
 
                 for (int i = 0; i < dt.Rows.Count && i < 7; i++)
                 {
-                    string tenDM = dt.Rows[i]["TenDanhMuc"].ToString();
+                    string tenDM = dt.Rows[i]["TenHienThi"].ToString();
                     decimal soTien = Convert.ToDecimal(dt.Rows[i]["TongTien"]);
                     double tyLe = tongTien > 0 ? (double)(soTien / tongTien) * 100 : 0;
 
@@ -880,7 +952,6 @@ namespace WpfApp
                     Canvas.SetTop(bar, y);
                     canvasBieuDoCot.Children.Add(bar);
 
-                    // Số tiền trên cột
                     TextBlock lblTien = new TextBlock
                     {
                         Text = values[i] >= 1000000
@@ -896,7 +967,6 @@ namespace WpfApp
                     Canvas.SetTop(lblTien, y - 25);
                     canvasBieuDoCot.Children.Add(lblTien);
 
-                    // Label dưới
                     TextBlock lblTen = new TextBlock
                     {
                         Text = labels[i],
@@ -1073,7 +1143,7 @@ namespace WpfApp
         {
             if (!this.IsLoaded) return;
             _kieuSoSanh = (cboKieuSoSanh.SelectedItem as ComboBoxItem)?.Content.ToString()
-                          ?? "📊 So sánh 2 tháng tự chọn";
+                          ?? "📊 So sánh 2 tháng";
             LoadBieuDoCot();
         }
 
