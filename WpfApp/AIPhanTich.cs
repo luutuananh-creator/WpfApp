@@ -43,7 +43,16 @@ namespace WpfApp
                 {
                     JObject json = JObject.Parse(responseString);
                     string resultText = json["choices"]?[0]?["message"]?["content"]?.ToString();
-                    return resultText?.Replace("```json", "").Replace("```", "").Trim();
+
+                    if (string.IsNullOrEmpty(resultText)) return "";
+
+                    // LÀM SẠCH VĂN BẢN: Xóa sạch các dấu ** và mã markdown thừa
+                    resultText = resultText.Replace("**", "")
+                                           .Replace("```json", "")
+                                           .Replace("```", "")
+                                           .Trim();
+
+                    return resultText;
                 }
                 else
                 {
