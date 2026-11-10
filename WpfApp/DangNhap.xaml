@@ -1,141 +1,179 @@
-﻿<Window x:Class="WpfApp.DangNhap"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp"
-        mc:Ignorable="d"
-        Title="Đăng nhập" WindowState="Maximized"
-        WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
-        Background="#F5F7FA">
+﻿ using System.Data.SqlClient;
+using System;
+using System.Text.RegularExpressions;
+using System.Windows;
+using WpfApp.Helpers; // Gọi EmailService và SecurityHelpers
 
-    <Grid >
-        <Border  Width="560"   VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" CornerRadius="12" Padding="30">
-            <Border.Effect>
-                <DropShadowEffect Color="#000" Opacity="0.08" BlurRadius="15" ShadowDepth="3"/>
-            </Border.Effect>
+namespace WpfApp
+{
+    public partial class DangKy : Window
+    {
+        private string maOTP = "";
 
-            <StackPanel>
+        public DangKy()
+        {
+            InitializeComponent();
+        }
 
-                <!-- ============================================================ -->
-                <!-- KHỐI 1: FORM ĐĂNG NHẬP ĐẦY ĐỦ (hiện mặc định)                 -->
-                <!-- ============================================================ -->
-                <StackPanel x:Name="spDangNhapDayDu">
+        private async void btnTaoTaiKhoan_Click(object sender, RoutedEventArgs e)
+        {
+            string taiKhoan = txtTaiKhoan.Text.Trim();
+            string email = txtEmail.Text.Trim();
+            string matKhau = txtMatKhau.Password;
+            string xacNhanMatKhau = txtXacNhanMatKhau.Password;
 
-                    <TextBlock Text="ĐĂNG NHẬP"
-                               FontSize="24" FontWeight="Bold"
-                               Foreground="#1F2937"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,25"/>
+            // 1. Kiểm tra trống
+            if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(email) ||
+                string.IsNullOrEmpty(matKhau) || string.IsNullOrEmpty(xacNhanMatKhau))
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
-                    <!-- Tên đăng nhập -->
-                    <TextBlock Text="Tên đăng nhập / Email:"
-                               FontWeight="SemiBold" Foreground="#4B5563"
-                               Margin="0,0,0,5"/>
-                    <TextBox x:Name="txtTenDangNhap"
-                             Height="38" Padding="8,0"
-                             VerticalContentAlignment="Center"
-                             FontSize="14"
-                             Margin="0,0,0,15"/>
+            // 2. Kiểm tra định dạng Email
+            if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                MessageBox.Show("Email không đúng định dạng!", "Lỗi",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
-                    <!-- Mật khẩu -->
-                    <TextBlock Text="Mật khẩu:"
-                               FontWeight="SemiBold" Foreground="#4B5563"
-                               Margin="0,0,0,5"/>
-                    <PasswordBox x:Name="txtMatKhau"
-                                 Height="38" Padding="8,0"
-                                 VerticalContentAlignment="Center"
-                                 FontSize="14"
-                                 Margin="0,0,0,5"/>
+            // 3. Kiểm tra mật khẩu khớp
+            if (matKhau != xacNhanMatKhau)
+            {
+                MessageBox.Show("Mật khẩu xác nhận không khớp!", "Lỗi",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
-                    <!-- Quên mật khẩu -->
-                    <Button x:Name="btnQuenMatKhau"
-                            Content="Quên mật khẩu?"
-                            Background="Transparent"
-                            Foreground="#2563EB"
-                            BorderThickness="0"
-                            FontSize="12"
-                            HorizontalAlignment="Right"
-                            Cursor="Hand"
-                            Margin="0,0,0,15"
-                            Click="btnQuenMatKhau_Click"/>
+            // 3.5. Kiểm tra tài khoản/email đã tồn tại chưa
+            if (KiemTraTonTai(taiKhoan, email))
+            {
+                return;
+            }
 
-                    <!-- Ghi nhớ đăng nhập -->
-                    <CheckBox x:Name="chkGhiNho"
-                              Content="Ghi nhớ đăng nhập"
-                              Foreground="#4B5563"
-                              Margin="0,0,0,20"/>
+            btnTaoTaiKhoan.IsEnabled = false;
+            btnTaoTaiKhoan.Content = "Đang gửi email...";
 
-                    <!-- Nút Đăng nhập -->
-                    <Button x:Name="btnDangNhap"
-                            Content="Đăng Nhập"
-                            Height="42"
-                            Background="#2563EB" Foreground="White"
-                            FontWeight="Bold" FontSize="14"
-                            BorderThickness="0" Cursor="Hand"
-                            Margin="0,0,0,10"
-                            Click="btnDangNhap_Click"/>
+            // 4. Sinh mã OTP và gửi Mail
+            maOTP = SecurityHelpers.GenerateOTP();
+            EmailService emailService = new EmailService();
+            bool daGuiMail = await emailService.SendOtpEmailAsync(email, maOTP, "Register");
 
-                    <!-- Nút Đăng ký -->
-                    <Button x:Name="btnDangKy"
-                            Content="Chưa có tài khoản? Đăng ký ngay"
-                            Height="38"
-                            Background="LightGray" Foreground="#1F2937"
-                            FontWeight="SemiBold" FontSize="13"
-                            BorderThickness="0" Cursor="Hand"
-                            Click="btnDangKy_Click"/>
-                </StackPanel>
+            btnTaoTaiKhoan.IsEnabled = true;
+            btnTaoTaiKhoan.Content = "Gửi Mã Xác Thực Email";
 
-                <!-- ============================================================ -->
-                <!-- KHỐI 2: XIN CHÀO (hiện khi đã ghi nhớ lần trước)              -->
-                <!-- ============================================================ -->
-                <StackPanel x:Name="spXinChao" Visibility="Collapsed">
+            if (!daGuiMail)
+            {
+                MessageBox.Show("Không thể gửi email xác nhận. Vui lòng kiểm tra lại kết nối hoặc địa chỉ Email!",
+                                "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
-                    <TextBlock Text="ĐĂNG NHẬP"
-                               FontSize="24" FontWeight="Bold"
-                               Foreground="#1F2937"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,25"/>
+            // 5. Mở hộp thoại nhập OTP xác nhận
+            string otpNhap = Microsoft.VisualBasic.Interaction.InputBox(
+                "Mã xác thực 6 chữ số đã được gửi tới email của bạn. Vui lòng nhập mã để hoàn tất đăng ký:",
+                "Xác Thực Email OTP", "");
 
-                    <TextBlock Text="👤"
-                               FontSize="60"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,15"/>
+            if (otpNhap == maOTP)
+            {
+                // Mã hóa mật khẩu trước khi lưu DB
+                string matKhauHash = SecurityHelpers.HashPassword(matKhau);
 
-                    <TextBlock x:Name="txtLoiChao"
-                               Text="Xin chào, ..."
-                               FontSize="18" FontWeight="SemiBold"
-                               Foreground="#1F2937"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,8"/>
+                if (LuuTaiKhoanVaoDB(taiKhoan, email, matKhauHash))
+                {
+                    MessageBox.Show("Đăng ký tài khoản thành công!", "Thành công",
+                                    MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    <TextBlock Text="Bạn đã ghi nhớ đăng nhập lần trước"
-                               FontSize="12" Foreground="#6B7280"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,30"/>
+                    DangNhap dangNhapWindow = new DangNhap();
+                    dangNhapWindow.Show();
+                    this.Close();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Mã OTP không chính xác. Đăng ký thất bại!", "Lỗi",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
-                    <!-- Nút Đăng nhập nhanh -->
-                    <Button x:Name="btnDangNhapNhanh"
-                            Content="🚀 Đăng nhập nhanh"
-                            Height="42"
-                            Background="#10B981" Foreground="White"
-                            FontWeight="Bold" FontSize="14"
-                            BorderThickness="0" Cursor="Hand"
-                            Margin="0,0,0,10"
-                            Click="btnDangNhapNhanh_Click"/>
+        ///<summary>
+    /// Kiểm tra tài khoản/email đã tồn tại trong DB chưa
+        ///</summary>
+private bool KiemTraTonTai(string taiKhoan, string email)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM NguoiDung WHERE TenDangNhap = @TaiKhoan OR Email = @Email";
 
-                    <!-- Nút Quay lại (Đổi tài khoản khác) -->
-                    <Button x:Name="btnQuayLai"
-                            Content="← Quay lại (Đổi tài khoản)"
-                            Height="38"
-                            Background="Transparent" Foreground="#6B7280"
-                            FontWeight="SemiBold" FontSize="13"
-                            BorderThickness="0" Cursor="Hand"
-                            Click="btnQuayLai_Click"/>
-                </StackPanel>
+                var parameters = new[]
+                {
+                    new SqlParameter("@TaiKhoan", taiKhoan),
+                    new SqlParameter("@Email", email)
+                };
 
-            </StackPanel>
-        </Border>
-    </Grid>
-</Window>
+                // Gọi DatabaseHelper (đã có overload parameters)
+                var dt = DatabaseHelper.GetData(query, parameters);
+                int count = Convert.ToInt32(dt.Rows[0][0]);
+
+                if (count > 0)
+                {
+                    MessageBox.Show("Tên đăng nhập hoặc Email đã tồn tại. Vui lòng chọn tên khác!",
+                                    "Trùng lặp", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi kiểm tra tài khoản: " + ex.Message,
+                                "Lỗi Database", MessageBoxButton.OK, MessageBoxImage.Error);
+                return true;  // Trả về true để dừng flow nếu có lỗi
+            }
+        }
+
+        ///
+<summary>
+    /// Lưu tài khoản mới vào database
+        ///</summary>
+private bool LuuTaiKhoanVaoDB(string taiKhoan, string email, string matKhauHash)
+        {
+            try
+            {
+                string query = @"INSERT INTO NguoiDung 
+                                    (TenDangNhap, Email, MatKhau, HoTen, TienTeMacDinh) 
+                                 VALUES 
+                                    (@TaiKhoan, @Email, @MatKhau, @HoTen, 'VND')";
+
+                var parameters = new[]
+                {
+                    new SqlParameter("@TaiKhoan", taiKhoan),
+                    new SqlParameter("@Email", email),
+                    new SqlParameter("@MatKhau", matKhauHash),
+                    new SqlParameter("@HoTen", taiKhoan)   // Tạm dùng tên đăng nhập làm họ tên
+                };
+
+                int rows = DatabaseHelper.ExecuteQuery(query, parameters);
+                return rows > 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Lỗi khi lưu tài khoản:\n\n" + ex.Message,
+                    "Lỗi Database",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return false;
+            }
+        }
+
+        private void btnQuayLai_Click(object sender, RoutedEventArgs e)
+        {
+            DangNhap dangNhapWindow = new DangNhap();
+            dangNhapWindow.Show();
+            this.Close();
+        }
+    }
+}
