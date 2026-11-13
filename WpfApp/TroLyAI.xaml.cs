@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-
+using System.Data.SqlClient;
 namespace WpfApp
 {
     public partial class TroLyAI : Page
@@ -81,13 +81,13 @@ namespace WpfApp
             }
         }
 
-        
+
         // 2. SỰ KIỆN: NÚT GỬI TIN NHẮN
-        
+
         private async void btnGuiTinNhan_Click(object sender, RoutedEventArgs e)
         {
             string cauHoi = txtChatInput.Text.Trim();
-            if (string.IsNullOrEmpty(cauHoi) || cauHoi == "Nhập yêu cầu của bạn vào đây...") return;
+            if (string.IsNullOrEmpty(cauHoi)) return;
 
             ThemTinNhanLenManHinh(cauHoi, true);
             txtChatInput.Clear();
@@ -95,24 +95,50 @@ namespace WpfApp
 
             try
             {
+                // 1. KHAI BÁO BIẾN DỮ LIỆU ĐÃ ĐƯỢC LẤY TỪ SQL (Khắc phục lỗi gạch đỏ)
                 string duLieuDB = LayDuLieuThucTeTuDB();
 
-                //  THÔNG MINH, LINH HOẠT VÀ HIỂU ĐÚNG NGỮ CẢNH
+                // 2. GOM LỊCH SỬ CHAT GẦN ĐÂY ĐỂ AI HIỂU NGỮ CẢNH (Gom 4 tin nhắn gần nhất)
+                string lichSuGanDay = "";
+                int count = chatMessages.Children.Count;
+                for (int i = Math.Max(0, count - 4); i < count; i++)
+                {
+                    if (chatMessages.Children[i] is Border b && b.Child is TextBlock tb)
+                    {
+                        lichSuGanDay += tb.Text + "\n";
+                    }
+                }
+
+                // 3. TẠO PROMPT GỬI CHO GROQ API
                 string prompt = $@"
-Bạn là trợ lý tài chính cá nhân xuất sắc. Đây là hồ sơ tài chính tháng này của tôi:
+Bạn là SmartFinance AI.
+Dữ liệu tài chính tháng này:
 {duLieuDB}
 
-QUY TẮC PHÂN TÍCH VÀ TƯ VẤN:
-1. NẾU TÔI NHỜ TƯ VẤN (VD: Lên thực đơn, kế hoạch đi chơi, mẹo tiết kiệm): Hãy thoải mái sáng tạo, tự do lên danh sách, bảng chi tiết cụ thể hoặc đưa ra các lựa chọn giả định cho tôi. Bạn được phép chia nhỏ số tiền để gợi ý.
-2. NẾU TÔI HỎI VỀ SỐ LIỆU ĐÃ LƯU: CHỈ dùng dữ liệu tôi cung cấp ở trên. Nếu tôi hỏi lịch sử chi tiết (VD: 'hôm qua mua gì', 'chi tiết tiền đi chợ') mà dữ liệu trên không có, HÃY ĐÁP: 'Hệ thống hiện tại chỉ tổng hợp theo danh mục, chưa xem được chi tiết từng món hàng'.
-3. PHÂN TÍCH HÀNH VI: Dựa vào 'Thói quen chi tiêu cao nhất', hãy linh hoạt đưa ra lời khuyên (VD: Thấy tiêu nhiều tiền Ăn uống thì khuyên nấu ăn ở nhà).
-4. Không dùng định dạng bảng Markdown (|||), hãy dùng các gạch đầu dòng hoặc đánh số thứ tự để liệt kê chi tiết cho dễ nhìn trên ứng dụng.
+LỊCH SỬ HỘI THOẠI VỪA RỒI:
+{lichSuGanDay}
 
-Yêu cầu/Câu hỏi của tôi: {cauHoi}";
+CÂU HỎI MỚI NHẤT CỦA NGƯỜI DÙNG: ""{cauHoi}""
 
-                // Gọi File GroqHelper 
+QUY TẮC PHẢN HỒI:
+1. ĐỌC KỸ LỊCH SỬ: Nếu người dùng trả lời ngắn như 'có', 'ok', 'được' -> Hãy hiểu họ đang đồng ý với đề xuất ngay phía trên và đưa ra giải pháp NGAY LẬP TỨC.
+2. KHÔNG DÙNG DẤU ** HAY MÃ MARKDOWN.
+3. NGẮN GỌN & SÚC TÍCH: Chỉ đưa ra tối đa 3-4 ý chính, mỗi ý không quá 2 dòng.
+4. NẾU TƯ VẤN MỤC TIÊU LỚN (Như Mua xe, Mua nhà): Hỏi nhẹ nhàng ngân sách dự kiến của người dùng thay vì tự bịa ra con số.";
+
+                // 4. HIỂN THỊ TRẠNG THÁI AI ĐANG XỬ LÝ
+                ThemTinNhanLenManHinh("⏳ AI đang suy nghĩ...", false);
+
+                // 5. GỬI YÊU CẦU SANG GROQ
                 string cauTraLoiAI = await AIPhanTich.GuiYeuCau(prompt);
 
+                // Xóa tin nhắn chờ
+                if (chatMessages.Children.Count > 0)
+                {
+                    chatMessages.Children.RemoveAt(chatMessages.Children.Count - 1);
+                }
+
+                // Hiển thị câu trả lời chính thức
                 ThemTinNhanLenManHinh(cauTraLoiAI, false);
             }
             catch (Exception ex)
@@ -126,33 +152,59 @@ Yêu cầu/Câu hỏi của tôi: {cauHoi}";
             }
         }
 
-     
+
         // 3. HÀM VẼ BONG BÓNG CHAT VÀ CÁC SỰ KIỆN NÚT BẤM
-        
+
         private void ThemTinNhanLenManHinh(string noiDung, bool laNguoiDung)
         {
+            // 1. Tạo TextBlock chứa nội dung tin nhắn
             var txt = new TextBlock
             {
                 Text = noiDung,
                 TextWrapping = TextWrapping.Wrap,
-                Foreground = laNguoiDung ? Brushes.White : Brushes.Black,
-                FontSize = 14
+                Foreground = laNguoiDung ? Brushes.White : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E293B")),
+                FontSize = 13.5,
+                LineHeight = 20, // Giúp các dòng chữ thoáng, dễ đọc hơn
+                FontFamily = new FontFamily("Segoe UI")
             };
 
+            // 2. Tạo Border bọc tin nhắn (Bong bóng chat)
             var border = new Border
             {
-                Background = laNguoiDung ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"))
-                                         : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F1F5F9")),
-                Padding = new Thickness(15),
-                CornerRadius = laNguoiDung ? new CornerRadius(8, 8, 0, 8) : new CornerRadius(8, 8, 8, 0),
+                Background = laNguoiDung
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2563EB")) // Xanh dương hiện đại cho User
+                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F1F5F9")), // Xám nhạt cao cấp cho AI
+                Padding = new Thickness(14, 10, 14, 10),
+                CornerRadius = laNguoiDung
+                    ? new CornerRadius(16, 16, 2, 16) // Bo góc kiểu tin nhắn Messenger/Telegram
+                    : new CornerRadius(16, 16, 16, 2),
                 HorizontalAlignment = laNguoiDung ? HorizontalAlignment.Right : HorizontalAlignment.Left,
-                MaxWidth = 350,
-                Margin = new Thickness(0, 0, 0, 15),
-                Child = txt
+                MaxWidth = 420, // Nới rộng độ rộng khung chat
+                Margin = new Thickness(0, 0, 0, 12)
             };
 
+            // 3. Thêm hiệu ứng đổ bóng nhẹ cho bong bóng chat của AI
+            if (!laNguoiDung)
+            {
+                border.Effect = new System.Windows.Media.Effects.DropShadowEffect
+                {
+                    Color = Colors.Black,
+                    Direction = 270,
+                    ShadowDepth = 1,
+                    Opacity = 0.08,
+                    BlurRadius = 4
+                };
+            }
+
+            border.Child = txt;
+
+            // 4. Thêm vào giao diện và tự động cuộn xuống dưới cùng
             chatMessages.Children.Add(border);
-            if (chatScroll != null) chatScroll.ScrollToEnd();
+            if (chatScroll != null)
+            {
+                chatScroll.UpdateLayout();
+                chatScroll.ScrollToEnd();
+            }
         }
 
         private void txtChatInput_PreviewKeyDown(object sender, KeyEventArgs e)

@@ -1,278 +1,177 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
+﻿using System.Data.SqlClient;
+using System;
+using System.Text.RegularExpressions;
 using System.Windows;
-using WpfApp.Helpers;
+using WpfApp.Helpers; // Gọi EmailService và SecurityHelpers
 
 namespace WpfApp
 {
-    public partial class DangNhap : Window
+    public partial class DangKy : Window
     {
-        // Đường dẫn file lưu tài khoản ghi nhớ: %APPDATA%\QuanLyTaiChinh\remember.txt
-        private static readonly string RememberFile =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                         "QuanLyTaiChinh", "remember.txt");
+        private string maOTP = "";
 
-        public static int MaNguoiDungHienTai { get; private set; } = 0;
-        public static string TenNguoiDungHienTai { get; private set; } = "";
-
-        public DangNhap()
+        public DangKy()
         {
             InitializeComponent();
-            Loaded += DangNhap_Loaded;
         }
 
-        // ============ LOAD: Kiểm tra ghi nhớ ============
-        private void DangNhap_Loaded(object sender, RoutedEventArgs e)
+        private async void btnTaoTaiKhoan_Click(object sender, RoutedEventArgs e)
         {
-            var (rememberUser, rememberPass) = DocTaiKhoanGhiNho();
+            string taiKhoan = txtTaiKhoan.Text.Trim();
+            string email = txtEmail.Text.Trim();
+            string matKhau = txtMatKhau.Password;
+            string xacNhanMatKhau = txtXacNhanMatKhau.Password;
 
-            if (!string.IsNullOrEmpty(rememberUser) && !string.IsNullOrEmpty(rememberPass))
+            // 1. Kiểm tra trống
+            if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(email) ||
+                string.IsNullOrEmpty(matKhau) || string.IsNullOrEmpty(xacNhanMatKhau))
             {
-                // Điền sẵn thông tin vào form
-                txtTenDangNhap.Text = rememberUser;
-                txtMatKhau.Password = rememberPass;
-                chkGhiNho.IsChecked = true;
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
-                // Có ghi nhớ → hiện màn hình xin chào
-                spDangNhapDayDu.Visibility = Visibility.Collapsed;
-                spXinChao.Visibility = Visibility.Visible;
-                txtLoiChao.Text = $"Xin chào, {rememberUser}";
+            // 2. Kiểm tra định dạng Email
+            if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                MessageBox.Show("Email không đúng định dạng!", "Lỗi",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // 3. Kiểm tra mật khẩu khớp
+            if (matKhau != xacNhanMatKhau)
+            {
+                MessageBox.Show("Mật khẩu xác nhận không khớp!", "Lỗi",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // 3.5. Kiểm tra tài khoản/email đã tồn tại chưa
+            if (KiemTraTonTai(taiKhoan, email))
+            {
+                return;
+            }
+
+            btnTaoTaiKhoan.IsEnabled = false;
+            btnTaoTaiKhoan.Content = "Đang gửi email...";
+
+            // 4. Sinh mã OTP và gửi Mail
+            maOTP = SecurityHelpers.GenerateOTP();
+            EmailService emailService = new EmailService();
+            bool daGuiMail = await emailService.SendOtpEmailAsync(email, maOTP, "Register");
+
+            btnTaoTaiKhoan.IsEnabled = true;
+            btnTaoTaiKhoan.Content = "Gửi Mã Xác Thực Email";
+
+            if (!daGuiMail)
+            {
+                MessageBox.Show("Không thể gửi email xác nhận. Vui lòng kiểm tra lại kết nối hoặc địa chỉ Email!",
+                                "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // 5. Mở hộp thoại nhập OTP xác nhận
+            string otpNhap = Microsoft.VisualBasic.Interaction.InputBox(
+                "Mã xác thực 6 chữ số đã được gửi tới email của bạn. Vui lòng nhập mã để hoàn tất đăng ký:",
+                "Xác Thực Email OTP", "");
+
+            if (otpNhap == maOTP)
+            {
+                // Mã hóa mật khẩu trước khi lưu DB
+                string matKhauHash = SecurityHelpers.HashPassword(matKhau);
+
+                if (LuuTaiKhoanVaoDB(taiKhoan, email, matKhauHash))
+                {
+                    MessageBox.Show("Đăng ký tài khoản thành công!", "Thành công",
+                                    MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    DangNhap dangNhapWindow = new DangNhap();
+                    dangNhapWindow.Show();
+                    this.Close();
+                }
             }
             else
             {
-                // Chưa ghi nhớ → hiện form đầy đủ
-                spDangNhapDayDu.Visibility = Visibility.Visible;
-                spXinChao.Visibility = Visibility.Collapsed;
-                txtTenDangNhap.Focus();
-            }
-        }
-
-        // ============ ĐĂNG NHẬP ============
-        private void btnDangNhap_Click(object sender, RoutedEventArgs e)
-        {
-            string taiKhoan = txtTenDangNhap.Text.Trim();
-            string matKhau = txtMatKhau.Password;
-            bool ghiNho = chkGhiNho.IsChecked == true;
-
-            DangNhapThuc(taiKhoan, matKhau, ghiNho);
-        }
-
-        // ============ ĐĂNG NHẬP NHANH ============
-        private void btnDangNhapNhanh_Click(object sender, RoutedEventArgs e)
-        {
-            var (taiKhoan, matKhau) = DocTaiKhoanGhiNho();
-
-            if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(matKhau))
-            {
-                MessageBox.Show("Không tìm thấy thông tin đăng nhập ghi nhớ!",
-                                "Lỗi", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                // Trở về màn hình đăng nhập thường
-                spDangNhapDayDu.Visibility = Visibility.Visible;
-                spXinChao.Visibility = Visibility.Collapsed;
-                return;
-            }
-
-            // Đăng nhập tự động ngay lập tức bằng dữ liệu đã ghi nhớ
-            DangNhapThuc(taiKhoan, matKhau, true);
-        }
-
-        // ============ QUAY LẠI (XÓA GHI NHỚ) ============
-        private void btnQuayLai_Click(object sender, RoutedEventArgs e)
-        {
-            var result = MessageBox.Show(
-                "Bạn muốn quay lại màn hình đăng nhập?\nThông tin ghi nhớ sẽ bị xóa.",
-                "Xác nhận",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result != MessageBoxResult.Yes) return;
-
-            // Xóa file ghi nhớ
-            XoaTaiKhoanGhiNho();
-
-            // Reset form
-            spDangNhapDayDu.Visibility = Visibility.Visible;
-            spXinChao.Visibility = Visibility.Collapsed;
-
-            txtTenDangNhap.Text = "";
-            txtMatKhau.Password = "";
-            txtTenDangNhap.IsReadOnly = false;
-            chkGhiNho.IsChecked = false;
-            txtTenDangNhap.Focus();
-        }
-
-        // ============ HÀM XỬ LÝ ĐĂNG NHẬP CHÍNH ============
-        private void DangNhapThuc(string taiKhoan, string matKhau, bool ghiNho)
-        {
-            if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(matKhau))
-            {
-                MessageBox.Show("Vui lòng nhập đầy đủ tài khoản và mật khẩu!",
-                                "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            try
-            {
-                string query = @"SELECT MaNguoiDung, TenDangNhap, Email, MatKhau, HoTen 
-                                 FROM NguoiDung 
-                                 WHERE TenDangNhap = @Ten OR Email = @Ten";
-
-                var parameters = new[] { new SqlParameter("@Ten", taiKhoan) };
-                DataTable dt = DatabaseHelper.GetData(query, parameters);
-
-                if (dt.Rows.Count == 0)
-                {
-                    MessageBox.Show("Tài khoản hoặc mật khẩu không chính xác!",
-                                    "Đăng nhập thất bại",
-                                    MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                string matKhauDB = dt.Rows[0]["MatKhau"].ToString();
-
-                // Verify — tự nhận diện plain text hay BCrypt hash
-                bool hopLe;
-                if (matKhauDB.StartsWith("$2"))
-                    hopLe = SecurityHelpers.VerifyPassword(matKhau, matKhauDB);
-                else
-                    hopLe = (matKhau == matKhauDB);
-
-                if (!hopLe)
-                {
-                    MessageBox.Show("Tài khoản hoặc mật khẩu không chính xác!",
-                                    "Đăng nhập thất bại",
-                                    MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                // Lưu session
-                MaNguoiDungHienTai = Convert.ToInt32(dt.Rows[0]["MaNguoiDung"]);
-                TenNguoiDungHienTai = dt.Rows[0]["HoTen"].ToString();
-
-                Session.MaNguoiDung = MaNguoiDungHienTai;
-                Session.HoTen = TenNguoiDungHienTai;
-                Session.TenDangNhap = dt.Rows[0]["TenDangNhap"].ToString();
-                Session.Email = dt.Rows[0]["Email"].ToString();
-
-                // Lưu/xóa ghi nhớ theo checkbox (Lưu cả tên + mật khẩu đã mã hóa)
-                if (ghiNho)
-                    LuuTaiKhoanGhiNho(dt.Rows[0]["TenDangNhap"].ToString(), matKhau);
-                else
-                    XoaTaiKhoanGhiNho();
-
-                MessageBox.Show($"Chào mừng {TenNguoiDungHienTai} quay trở lại!",
-                                "Đăng nhập thành công",
-                                MessageBoxButton.OK, MessageBoxImage.Information);
-
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
-                this.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi kết nối CSDL: " + ex.Message,
-                                "Lỗi Database",
+                MessageBox.Show("Mã OTP không chính xác. Đăng ký thất bại!", "Lỗi",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        // ============ LƯU/ĐỌC/XÓA GHI NHỚ MÃ HÓA (DPAPI) ============
-        private void LuuTaiKhoanGhiNho(string tenDangNhap, string matKhau)
+        /// <summary>
+        /// Kiểm tra tài khoản/email đã tồn tại trong DB chưa
+        /// </summary>
+        private bool KiemTraTonTai(string taiKhoan, string email)
         {
             try
             {
-                string folder = Path.GetDirectoryName(RememberFile);
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
+                string query = "SELECT COUNT(*) FROM NguoiDung WHERE TenDangNhap = @TaiKhoan OR Email = @Email";
 
-                string rawData = $"{tenDangNhap}|{matKhau}";
-                string encryptedData = EncryptDPAPI(rawData);
-
-                File.WriteAllText(RememberFile, encryptedData);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Lỗi lưu ghi nhớ: {ex.Message}");
-            }
-        }
-
-        private (string username, string password) DocTaiKhoanGhiNho()
-        {
-            try
-            {
-                if (File.Exists(RememberFile))
+                var parameters = new[]
                 {
-                    string encryptedData = File.ReadAllText(RememberFile).Trim();
-                    string decryptedData = DecryptDPAPI(encryptedData);
+                    new SqlParameter("@TaiKhoan", taiKhoan),
+                    new SqlParameter("@Email", email)
+                };
 
-                    if (!string.IsNullOrEmpty(decryptedData) && decryptedData.Contains("|"))
-                    {
-                        string[] parts = decryptedData.Split('|');
-                        return (parts[0], parts[1]);
-                    }
+                // Gọi DatabaseHelper (đã có overload parameters)
+                var dt = DatabaseHelper.GetData(query, parameters);
+                int count = Convert.ToInt32(dt.Rows[0][0]);
+
+                if (count > 0)
+                {
+                    MessageBox.Show("Tên đăng nhập hoặc Email đã tồn tại. Vui lòng chọn tên khác!",
+                                    "Trùng lặp", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return true;
                 }
+
+                return false;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Lỗi đọc ghi nhớ: {ex.Message}");
+                MessageBox.Show("Lỗi kiểm tra tài khoản: " + ex.Message,
+                                "Lỗi Database", MessageBoxButton.OK, MessageBoxImage.Error);
+                return true;  // Trả về true để dừng flow nếu có lỗi
             }
-            return ("", "");
         }
 
-        private void XoaTaiKhoanGhiNho()
+        /// <summary>
+        /// Lưu tài khoản mới vào database
+        /// </summary>
+        private bool LuuTaiKhoanVaoDB(string taiKhoan, string email, string matKhauHash)
         {
             try
             {
-                if (File.Exists(RememberFile))
-                    File.Delete(RememberFile);
+                string query = @"INSERT INTO NguoiDung 
+                                    (TenDangNhap, Email, MatKhau, HoTen, TienTeMacDinh) 
+                                 VALUES 
+                                    (@TaiKhoan, @Email, @MatKhau, @HoTen, 'VND')";
+
+                var parameters = new[]
+                {
+                    new SqlParameter("@TaiKhoan", taiKhoan),
+                    new SqlParameter("@Email", email),
+                    new SqlParameter("@MatKhau", matKhauHash),
+                    new SqlParameter("@HoTen", taiKhoan)   // Tạm dùng tên đăng nhập làm họ tên
+                };
+
+                int rows = DatabaseHelper.ExecuteQuery(query, parameters);
+                return rows > 0;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Lỗi xóa ghi nhớ: {ex.Message}");
+                MessageBox.Show(
+                    "Lỗi khi lưu tài khoản:\n\n" + ex.Message,
+                    "Lỗi Database",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return false;
             }
         }
 
-        // Helper mã hóa DPAPI an toàn (dựa theo tài khoản Windows)
-        private string EncryptDPAPI(string plainText)
+        private void btnQuayLai_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(plainText)) return "";
-            byte[] data = Encoding.UTF8.GetBytes(plainText);
-            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
-            return Convert.ToBase64String(encrypted);
-        }
-
-        private string DecryptDPAPI(string encryptedText)
-        {
-            if (string.IsNullOrEmpty(encryptedText)) return "";
-            try
-            {
-                byte[] data = Convert.FromBase64String(encryptedText);
-                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
-                return Encoding.UTF8.GetString(decrypted);
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        // ============ CÁC NÚT KHÁC ============
-        private void btnDangKy_Click(object sender, RoutedEventArgs e)
-        {
-            DangKy dangKyWin = new DangKy();
-            dangKyWin.Show();
-            this.Close();
-        }
-
-        private void btnQuenMatKhau_Click(object sender, RoutedEventArgs e)
-        {
-            DoiMatKhau quenMatKhau = new DoiMatKhau();
-            quenMatKhau.Show();
+            DangNhap dangNhapWindow = new DangNhap();
+            dangNhapWindow.Show();
             this.Close();
         }
     }
