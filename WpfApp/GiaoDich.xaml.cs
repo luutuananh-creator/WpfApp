@@ -31,7 +31,7 @@ namespace WpfApp
         {
             try
             {
-                // CẬP NHẬT: Select thêm g.MaGiaoDich
+                
                 string query = $@"
                     SELECT g.MaGiaoDich, g.NgayGiaoDich, d.LoaiDanhMuc, d.TenDanhMuc, g.GhiChu, g.SoTien 
                     FROM GiaoDich g
@@ -47,8 +47,8 @@ namespace WpfApp
                     danhSachGoc.Add(new GiaoDichModel
                     {
                         MaGiaoDich = Convert.ToInt32(row["MaGiaoDich"]),
-                        NgayGiaoDich = Convert.ToDateTime(row["NgayGiaoDich"]), // Lưu biến Date thật để dễ lọc tháng
-                        Ngay = Convert.ToDateTime(row["NgayGiaoDich"]).ToString("dd/MM/yyyy"), // Chuỗi hiển thị lên bảng
+                        NgayGiaoDich = Convert.ToDateTime(row["NgayGiaoDich"]), 
+                        Ngay = Convert.ToDateTime(row["NgayGiaoDich"]).ToString("dd/MM/yyyy"), 
                         Loai = row["LoaiDanhMuc"].ToString(),
                         DanhMuc = row["TenDanhMuc"].ToString(),
                         GhiChu = row["GhiChu"].ToString(),
@@ -56,7 +56,7 @@ namespace WpfApp
                     });
                 }
 
-                LocDuLieu(); // Gọi hàm lọc thay vì gán thẳng vào DataGrid
+                LocDuLieu(); 
             }
             catch (Exception ex)
             {
@@ -70,7 +70,7 @@ namespace WpfApp
 
             var ketQua = danhSachGoc.AsEnumerable();
 
-            // A. Lọc theo Text tìm kiếm (Ghi chú hoặc Danh mục)
+            
             if (txtTimKiem != null)
             {
                 string keyword = txtTimKiem.Text.ToLower().Replace("🔍", "").Trim();
@@ -143,7 +143,7 @@ namespace WpfApp
             }
             else
             {
-                if (cboLocChiTietDanhMuc != null)
+                if (cboLocChiTietDanhMuc != null)// thêm dòng
                 {
                     cboLocChiTietDanhMuc.Visibility = Visibility.Visible;
                     LoadChiTietDanhMuc(loai);
@@ -153,7 +153,7 @@ namespace WpfApp
             LocDuLieu();
         }
 
-        private void LoadChiTietDanhMuc(string loaiDanhMuc)
+        private void LoadChiTietDanhMuc(string loaiDanhMuc)// gắn lệnh
         {
             try
             {
@@ -167,7 +167,7 @@ namespace WpfApp
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    foreach (DataRow row in dt.Rows)
+                    foreach (DataRow row in dt.Rows)// làm hết
                     {
                         cboLocChiTietDanhMuc.Items.Add(new ComboBoxItem { Content = row["TenDanhMuc"].ToString() });
                     }
